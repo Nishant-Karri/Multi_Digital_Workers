@@ -1,0 +1,33 @@
+{
+  "rules": [
+    {
+      "match": { "type": "bug", "priority": "critical" },
+      "assign": "mayor",
+      "notes": "Mayor handles critical bugs directly"
+    },
+    {
+      "match": { "type": "feature", "project": "nwt" },
+      "assign": "worker",
+      "review_required": true,
+      "reviewer": "refinery"
+    },
+    {
+      "match": { "type": "review" },
+      "assign": "refinery"
+    },
+    {
+      "match": { "type": "monitor" },
+      "assign": "monitor"
+    },
+    {
+      "match": { "type": "task" },
+      "assign": "worker",
+      "review_required": false
+    }
+  ],
+  "defaults": {
+    "assign": "worker",
+    "review_required": false,
+    "timeout_minutes": 60
+  }
+}

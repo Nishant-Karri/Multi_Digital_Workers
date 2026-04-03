@@ -1,0 +1,35 @@
+{
+  "agents": [
+    {
+      "id": "mayor",
+      "role": "Global Orchestrator",
+      "claude_md": "agents/mayor/CLAUDE.md",
+      "description": "Coordinates all agents, dispatches tasks, handles escalations",
+      "spawns": ["worker", "monitor", "refinery"]
+    },
+    {
+      "id": "worker",
+      "role": "Task Executor",
+      "claude_md": "agents/worker/CLAUDE.md",
+      "description": "Executes scoped implementation tasks",
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "monitor",
+      "role": "Observability",
+      "claude_md": "agents/monitor/CLAUDE.md",
+      "description": "Watches task health, reports blockers and alerts",
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "refinery",
+      "role": "Code Quality Gate",
+      "claude_md": "agents/refinery/CLAUDE.md",
+      "description": "Reviews and merges code changes",
+      "spawned_by": "mayor"
+    }
+  ],
+  "spawn_pattern": "claude_agent_tool",
+  "state_backend": "json_files",
+  "communication": "mail_files"
+}
