@@ -1,0 +1,15 @@
+# Core (always needed)
+boto3>=1.34.0
+cryptography>=42.0.0
+
+# Snowflake
+snowflake-connector-python>=3.6.0
+
+# KQL / Azure Data Explorer
+azure-kusto-data>=4.3.0
+
+# Informatica / Talend (HTTP only)
+requests>=2.31.0
+
+# dbt
+dbt-snowflake>=1.7.0

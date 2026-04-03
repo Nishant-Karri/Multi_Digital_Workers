@@ -2,3 +2,12 @@ __pycache__/
 *.pyc
 .DS_Store
 *.log
+
+# Credentials — NEVER commit these
+.env
+.vault/
+*.enc
+*.p8
+*.pem
+rsa_key*
+dbt/profiles.yml
