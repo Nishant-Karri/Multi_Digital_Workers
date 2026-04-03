@@ -1,0 +1,27 @@
+{
+  "pool": {
+    "min_workers": 1,
+    "max_workers": 10,
+    "scale_up_threshold": 3,
+    "scale_down_idle_minutes": 10,
+    "max_parallel_large_tasks": 3,
+    "max_parallel_epics": 2
+  },
+  "task_sizes": {
+    "small":  { "max_subtasks": 1,  "max_workers": 1,  "timeout_minutes": 10,  "description": "Single focused task, no decomposition" },
+    "medium": { "max_subtasks": 1,  "max_workers": 1,  "timeout_minutes": 30,  "description": "Single agent, moderate complexity" },
+    "large":  { "max_subtasks": 5,  "max_workers": 3,  "timeout_minutes": 120, "description": "Decomposed into subtasks, multiple workers" },
+    "epic":   { "max_subtasks": 20, "max_workers": 10, "timeout_minutes": 480, "description": "Multi-stage pipeline, full agent fleet" }
+  },
+  "auto_classify": {
+    "keywords_large": ["refactor", "migrate", "pipeline", "all tables", "entire", "end-to-end", "full"],
+    "keywords_epic":  ["etl", "data warehouse", "multi-step", "phases", "sprint", "overhaul"]
+  },
+  "worker_roles": {
+    "data":    { "handles": ["sql", "snowflake", "dbt", "etl", "kql"],          "description": "Data engineering tasks" },
+    "infra":   { "handles": ["aws", "ec2", "s3", "glue", "ssm", "terraform"],   "description": "Infrastructure tasks" },
+    "code":    { "handles": ["python", "bug", "feature", "api", "dashboard"],    "description": "Software development tasks" },
+    "review":  { "handles": ["review", "qa", "test", "validate"],               "description": "Quality and review tasks" },
+    "general": { "handles": ["*"],                                               "description": "Catch-all worker" }
+  }
+}

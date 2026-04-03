@@ -3,6 +3,9 @@ __pycache__/
 .DS_Store
 *.log
 
+# Runtime state (ephemeral, regenerated each session)
+.runtime/pool.json
+
 # Credentials — NEVER commit these
 .env
 .vault/
