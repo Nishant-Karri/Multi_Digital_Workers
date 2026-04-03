@@ -1,0 +1,119 @@
+{
+  "layers": {
+    "landing": {
+      "description": "Raw source data — S3 Parquet via Glue",
+      "type": "snowflake_external",
+      "database": "NISHANT_DS_DB",
+      "schema": "NISHANT_WORKFLOW_TEST",
+      "tables": {
+        "orders":        "NWT_ORDER_FILE",
+        "order_products":"NWT_ORDER_PRODUCT_FILE",
+        "stores":        "NWT_STORE_FILE",
+        "dates":         "NWT_DATE_FILE",
+        "dayparts":      "NWT_DAYPART_FILE"
+      }
+    },
+    "curated": {
+      "description": "Deduplicated Iceberg tables — Glue landing→curated job",
+      "type": "snowflake_external",
+      "database": "NISHANT_DS_DB",
+      "schema": "NISHANT_WORKFLOW_TEST",
+      "tables": {
+        "orders":        "NWT_ORDER_FILE",
+        "order_products":"NWT_ORDER_PRODUCT_FILE",
+        "stores":        "NWT_STORE_FILE",
+        "dates":         "NWT_DATE_FILE",
+        "dayparts":      "NWT_DAYPART_FILE"
+      }
+    },
+    "dbt": {
+      "description": "dbt star schema — fact + dimension models",
+      "type": "snowflake",
+      "database": "NISHANT_DS_DB",
+      "schema": "NISHANT_WORKFLOW_TEST",
+      "tables": {
+        "fact_orders":   "FACT_ORDER",
+        "dim_store":     "DIM_STORE",
+        "dim_date":      "DIM_DATE",
+        "dim_daypart":   "DIM_DAYPART"
+      }
+    },
+    "report": {
+      "description": "Report / presentation layer — consumed by dashboards",
+      "type": "snowflake",
+      "database": "NISHANT_DS_DB",
+      "schema": "NISHANT_WORKFLOW_TEST",
+      "tables": {
+        "fact_orders":   "FACT_ORDER",
+        "dim_store":     "DIM_STORE",
+        "dim_date":      "DIM_DATE",
+        "dim_daypart":   "DIM_DAYPART"
+      }
+    }
+  },
+
+  "checks": {
+    "freshness": {
+      "enabled": true,
+      "warn_hours": 2,
+      "fail_hours": 24,
+      "timestamp_col": "insert_timestamp"
+    },
+    "row_count": {
+      "enabled": true,
+      "warn_drop_pct": 5,
+      "fail_drop_pct": 20
+    },
+    "nulls": {
+      "enabled": true,
+      "columns": {
+        "NWT_ORDER_FILE":       ["order_id", "store_id", "business_date", "net_sales"],
+        "NWT_ORDER_PRODUCT_FILE":["order_id", "product_id"],
+        "FACT_ORDER":           ["order_id", "store_sk", "date_sk", "net_sales"],
+        "DIM_STORE":            ["store_sk", "store_id", "city", "state"],
+        "DIM_DATE":             ["date_sk", "business_date"],
+        "DIM_DAYPART":          ["daypart_sk", "daypart"]
+      },
+      "fail_rate_pct": 5
+    },
+    "duplicates": {
+      "enabled": true,
+      "primary_keys": {
+        "NWT_ORDER_FILE":       ["order_id"],
+        "NWT_ORDER_PRODUCT_FILE":["order_id", "product_id"],
+        "FACT_ORDER":           ["order_id"],
+        "DIM_STORE":            ["store_sk"],
+        "DIM_DATE":             ["date_sk"],
+        "DIM_DAYPART":          ["daypart_sk"]
+      }
+    },
+    "schema_drift": {
+      "enabled": true,
+      "snapshot_dir": "observability/snapshots"
+    }
+  },
+
+  "comparisons": [
+    {
+      "id":          "orders_curated_vs_dbt",
+      "description": "Order row counts: curated layer vs dbt FACT_ORDER",
+      "source":      { "layer": "curated", "table": "NWT_ORDER_FILE",  "key": "order_id" },
+      "target":      { "layer": "dbt",     "table": "FACT_ORDER",      "key": "order_id" },
+      "metrics":     ["row_count", "sum_net_sales", "distinct_store_ids", "date_range"]
+    },
+    {
+      "id":          "orders_dbt_vs_report",
+      "description": "FACT_ORDER vs report layer — should be identical",
+      "source":      { "layer": "dbt",    "table": "FACT_ORDER", "key": "order_id" },
+      "target":      { "layer": "report", "table": "FACT_ORDER", "key": "order_id" },
+      "metrics":     ["row_count", "sum_net_sales", "sum_gross_sales", "sum_discount_amount"]
+    },
+    {
+      "id":          "stores_curated_vs_dim",
+      "description": "Store count: curated vs DIM_STORE",
+      "source":      { "layer": "curated", "table": "NWT_STORE_FILE", "key": "store_id" },
+      "target":      { "layer": "dbt",     "table": "DIM_STORE",      "key": "store_id" },
+      "metrics":     ["row_count", "distinct_store_ids"]
+    }
+  ]
+}
