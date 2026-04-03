@@ -5,7 +5,7 @@
       "name": "Nishant_Workflow_Test",
       "description": "AWS Glue ETL pipeline + Snowflake + dbt star schema",
       "repo": "local",
-      "tech_stack": ["AWS Glue", "Snowflake", "dbt", "S3", "Iceberg"],
+      "tech_stack": ["AWS", "Snowflake", "Python", "SQL", "dbt"],
       "default_assignee": "worker",
       "priority": "high"
     },
@@ -14,7 +14,7 @@
       "name": "NWT Dashboard",
       "description": "Flask + SocketIO real-time pipeline operations dashboard",
       "repo": "local",
-      "tech_stack": ["Python", "Flask", "SocketIO", "Plotly"],
+      "tech_stack": ["Python", "AWS", "SQL", "Snowflake"],
       "default_assignee": "worker",
       "priority": "high"
     },
@@ -23,7 +23,7 @@
       "name": "Gas Town EC2",
       "description": "Gas Town installation on EC2 instances",
       "repo": "local",
-      "tech_stack": ["Gas Town", "AWS SSM", "Linux", "Windows"],
+      "tech_stack": ["AWS", "Python"],
       "default_assignee": "worker",
       "priority": "medium"
     },
@@ -32,9 +32,10 @@
       "name": "Mayor Workspace",
       "description": "This orchestrator repo",
       "repo": "https://github.com/Nishant-Karri/Nishant_gastown_replica",
-      "tech_stack": ["Python", "Claude Code", "Multi-agent"],
+      "tech_stack": ["Python", "AWS", "SQL", "Snowflake", "KQL", "Informatica", "Talend", "dbt"],
       "default_assignee": "mayor",
       "priority": "high"
     }
-  ]
+  ],
+  "global_tech_stack": ["AWS", "Snowflake", "Python", "SQL", "KQL", "Informatica", "Talend", "dbt"]
 }
