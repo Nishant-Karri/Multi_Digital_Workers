@@ -5,7 +5,9 @@
       "role": "Global Orchestrator",
       "claude_md": "agents/mayor/CLAUDE.md",
       "description": "Coordinates all agents, dispatches tasks, handles escalations",
-      "spawns": ["worker", "monitor", "refinery"]
+      "spawns": ["worker", "monitor", "refinery", "data_engineer", "analytics_engineer",
+                 "streaming_engineer", "data_scientist", "governance", "dataops",
+                 "cloud_infra", "data_quality", "reliability", "investigator", "qa", "cicd"]
     },
     {
       "id": "worker",
@@ -26,6 +28,107 @@
       "role": "Code Quality Gate",
       "claude_md": "agents/refinery/CLAUDE.md",
       "description": "Reviews and merges code changes",
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "data_engineer",
+      "role": "Data Engineer",
+      "claude_md": "agents/data_engineer/CLAUDE.md",
+      "description": "ETL pipelines, Glue/Spark jobs, Informatica/Talend, S3 data lake",
+      "domains": ["etl_pipelines", "data_lake", "batch_orchestration", "cdc_streaming",
+                  "metadata_management"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "analytics_engineer",
+      "role": "Analytics Engineer",
+      "claude_md": "agents/analytics_engineer/CLAUDE.md",
+      "description": "dbt models, star/snowflake schemas, Snowflake optimization, BI layer",
+      "domains": ["dbt_modelling", "data_warehouse", "data_mart", "semantic_layer",
+                  "reverse_etl"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "streaming_engineer",
+      "role": "Streaming Engineer",
+      "claude_md": "agents/streaming_engineer/CLAUDE.md",
+      "description": "Kafka, Kinesis, real-time pipelines, CDC",
+      "domains": ["cdc_streaming", "event_streaming", "real_time_analytics"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "data_scientist",
+      "role": "Data Scientist / ML Engineer",
+      "claude_md": "agents/data_scientist/CLAUDE.md",
+      "description": "ML models, feature stores, SageMaker, Azure ML, MLflow",
+      "domains": ["feature_engineering", "model_training", "model_serving", "mlops",
+                  "experimentation"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "governance",
+      "role": "Data Governance & Catalog",
+      "claude_md": "agents/governance/CLAUDE.md",
+      "description": "Collibra, DataHub, lineage, PII, GDPR, access control",
+      "domains": ["data_governance", "data_catalog", "data_lineage", "pii_masking",
+                  "access_control"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "dataops",
+      "role": "DataOps",
+      "claude_md": "agents/dataops/CLAUDE.md",
+      "description": "Airflow DAGs, CI/CD, pipeline reliability, cost optimization",
+      "domains": ["pipeline_reliability", "cost_optimization", "self_service_analytics",
+                  "platform_engineering"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "cloud_infra",
+      "role": "Cloud Infrastructure",
+      "claude_md": "agents/cloud_infra/CLAUDE.md",
+      "description": "Terraform, VPC, IAM, S3, compute, IaC",
+      "domains": ["cloud_infra", "platform_engineering"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "data_quality",
+      "role": "Data Quality",
+      "claude_md": "agents/data_quality/CLAUDE.md",
+      "description": "Great Expectations suites, SLA monitoring, quality dashboards",
+      "domains": ["data_quality"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "reliability",
+      "role": "Data Reliability / SRE",
+      "claude_md": "agents/reliability/CLAUDE.md",
+      "description": "Incident management, pipeline monitoring, SLO tracking, alerting",
+      "domains": ["pipeline_reliability"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "investigator",
+      "role": "Pipeline Investigator",
+      "claude_md": "agents/investigator/CLAUDE.md",
+      "description": "Investigates job failures, schema/data drift, freshness, nulls",
+      "domains": ["pipeline_reliability", "data_quality"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "qa",
+      "role": "QA Agent",
+      "claude_md": "agents/qa/CLAUDE.md",
+      "description": "Test plans, test cases, sample data, QA runs, lineage docs, git tags",
+      "domains": ["data_quality", "dbt_modelling", "etl_pipelines"],
+      "spawned_by": "mayor"
+    },
+    {
+      "id": "cicd",
+      "role": "CI/CD & Infrastructure Agent",
+      "claude_md": "agents/cicd/CLAUDE.md",
+      "description": "GitHub Actions workflows, Terraform VPC + data platform, IAM, S3",
+      "domains": ["cloud_infra", "platform_engineering"],
       "spawned_by": "mayor"
     }
   ],

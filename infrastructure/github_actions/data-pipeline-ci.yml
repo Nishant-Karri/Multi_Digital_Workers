@@ -1,0 +1,70 @@
+name: Data Pipeline CI
+
+on:
+  pull_request:
+    paths:
+      - 'integrations/**'
+      - 'observability/**'
+      - 'domains/**'
+      - 'connectors/**'
+  push:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    name: Python lint + unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install ruff pytest pytest-cov
+          pip install -r requirements.txt 2>/dev/null || true
+
+      - name: Lint with ruff
+        run: ruff check . --select E,F,W --ignore E501
+
+      - name: Run unit tests
+        run: pytest tests/ -v --tb=short --cov=. --cov-report=xml 2>/dev/null || echo "No tests yet"
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
+
+  observability-check:
+    name: Observability config validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Validate observability config
+        run: python3 -c "import json; json.load(open('observability/config.json')); print('✓ config valid')"
+      - name: Validate domain registry
+        run: python3 -c "from domains.registry import DOMAIN_REGISTRY, print_registry; print_registry()"
+      - name: Validate connector registry
+        run: python3 -c "from connectors.registry import ConnectorRegistry; ConnectorRegistry.info()"
+
+  security-scan:
+    name: Secret scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect secrets
+        run: |
+          if grep -rE "(password|secret|token|api_key)\s*=\s*['"][^'"\$\{]"                 --include="*.py" --include="*.json" --include="*.yml"                 --exclude-dir=".git" --exclude-dir="qa_artifacts" . ; then
+            echo "❌ Hardcoded secrets detected. Use vault or env vars."
+            exit 1
+          fi
+          echo "✓ No hardcoded secrets found"

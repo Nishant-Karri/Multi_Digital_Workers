@@ -6,10 +6,108 @@
       "notes": "Mayor handles critical bugs directly"
     },
     {
-      "match": { "type": "feature", "project": "nwt" },
-      "assign": "worker",
+      "match": { "type": "incident" },
+      "assign": "reliability",
+      "notes": "All incidents go to the reliability agent"
+    },
+    {
+      "match": { "type": "investigation" },
+      "assign": "investigator",
+      "notes": "Schema/data drift, freshness, null check investigations"
+    },
+    {
+      "match": { "type": "qa" },
+      "assign": "qa",
+      "notes": "Test generation, QA runs, lineage docs"
+    },
+    {
+      "match": { "type": "infra" },
+      "assign": "cicd",
+      "notes": "Terraform, VPC, GitHub Actions"
+    },
+    {
+      "match": { "domain": "etl_pipelines" },
+      "assign": "data_engineer"
+    },
+    {
+      "match": { "domain": "data_lake" },
+      "assign": "data_engineer"
+    },
+    {
+      "match": { "domain": "batch_orchestration" },
+      "assign": "data_engineer"
+    },
+    {
+      "match": { "domain": "cdc_streaming" },
+      "assign": "streaming_engineer"
+    },
+    {
+      "match": { "domain": "event_streaming" },
+      "assign": "streaming_engineer"
+    },
+    {
+      "match": { "domain": "dbt_modelling" },
+      "assign": "analytics_engineer",
       "review_required": true,
       "reviewer": "refinery"
+    },
+    {
+      "match": { "domain": "data_warehouse" },
+      "assign": "analytics_engineer"
+    },
+    {
+      "match": { "domain": "data_mart" },
+      "assign": "analytics_engineer"
+    },
+    {
+      "match": { "domain": "semantic_layer" },
+      "assign": "analytics_engineer"
+    },
+    {
+      "match": { "domain": "feature_engineering" },
+      "assign": "data_scientist"
+    },
+    {
+      "match": { "domain": "model_training" },
+      "assign": "data_scientist"
+    },
+    {
+      "match": { "domain": "mlops" },
+      "assign": "data_scientist"
+    },
+    {
+      "match": { "domain": "data_governance" },
+      "assign": "governance"
+    },
+    {
+      "match": { "domain": "data_catalog" },
+      "assign": "governance"
+    },
+    {
+      "match": { "domain": "pii_masking" },
+      "assign": "governance",
+      "review_required": true,
+      "reviewer": "mayor"
+    },
+    {
+      "match": { "domain": "data_quality" },
+      "assign": "data_quality"
+    },
+    {
+      "match": { "domain": "pipeline_reliability" },
+      "assign": "reliability"
+    },
+    {
+      "match": { "domain": "cloud_infra" },
+      "assign": "cicd"
+    },
+    {
+      "match": { "domain": "platform_engineering" },
+      "assign": "dataops"
+    },
+    {
+      "match": { "domain": "cost_optimization" },
+      "assign": "dataops"
     },
     {
       "match": { "type": "review" },
@@ -18,6 +116,12 @@
     {
       "match": { "type": "monitor" },
       "assign": "monitor"
+    },
+    {
+      "match": { "type": "feature", "project": "nwt" },
+      "assign": "worker",
+      "review_required": true,
+      "reviewer": "refinery"
     },
     {
       "match": { "type": "task" },

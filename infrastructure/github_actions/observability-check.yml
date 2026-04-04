@@ -1,0 +1,45 @@
+name: Observability Check
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'   # Every 2 hours
+  workflow_dispatch:
+
+jobs:
+  observe:
+    name: Run observability checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install snowflake-connector-python requests 2>/dev/null || true
+
+      - name: Run observability
+        run: python3 observability/observer.py run
+        env:
+          NGR_SNOWFLAKE_ACCOUNT:   ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          NGR_SNOWFLAKE_USER:      ${{ secrets.SNOWFLAKE_USER }}
+          NGR_SNOWFLAKE_PASSWORD:  ${{ secrets.SNOWFLAKE_PASSWORD }}
+          NGR_SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          NGR_SNOWFLAKE_DATABASE:  ${{ secrets.SNOWFLAKE_DATABASE }}
+          NGR_SNOWFLAKE_SCHEMA:    ${{ secrets.SNOWFLAKE_SCHEMA }}
+          NGR_TEAMS_WEBHOOK:       ${{ secrets.TEAMS_WEBHOOK }}
+          NGR_SLACK_WEBHOOK:       ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Run cross-layer comparisons
+        run: python3 observability/observer.py compare
+        env:
+          NGR_SNOWFLAKE_ACCOUNT:   ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          NGR_SNOWFLAKE_USER:      ${{ secrets.SNOWFLAKE_USER }}
+          NGR_SNOWFLAKE_PASSWORD:  ${{ secrets.SNOWFLAKE_PASSWORD }}
+          NGR_SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          NGR_SNOWFLAKE_DATABASE:  ${{ secrets.SNOWFLAKE_DATABASE }}
+          NGR_SNOWFLAKE_SCHEMA:    ${{ secrets.SNOWFLAKE_SCHEMA }}
+          NGR_TEAMS_WEBHOOK:       ${{ secrets.TEAMS_WEBHOOK }}
+          NGR_SLACK_WEBHOOK:       ${{ secrets.SLACK_WEBHOOK }}

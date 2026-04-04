@@ -1,0 +1,80 @@
+# dbt/profiles.yml.template
+# Copy to ~/.dbt/profiles.yml and fill in your values.
+# Alternatively, set the environment variables and the template
+# will be rendered by: python3 ngr.py infra generate --type dbt-profile
+
+# ── Snowflake (default target) ────────────────────────────────────────────
+nwt:
+  target: dev
+  outputs:
+
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'NWT_DEV') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH') }}"
+      schema: dbt_dev
+      threads: 4
+      client_session_keep_alive: false
+      query_tag: "dbt-dev"
+      connect_retries: 3
+      connect_timeout: 30
+
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'NWT_PROD') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH') }}"
+      schema: dbt_prod
+      threads: 8
+      client_session_keep_alive: false
+      query_tag: "dbt-prod"
+      connect_retries: 3
+      connect_timeout: 30
+
+# ── BigQuery (optional) ───────────────────────────────────────────────────
+# nwt_bq:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: bigquery
+#       method: oauth           # or service-account
+#       project: "{{ env_var('GCP_PROJECT') }}"
+#       dataset: dbt_dev
+#       threads: 4
+#       timeout_seconds: 300
+#       location: US
+
+# ── Redshift (optional) ───────────────────────────────────────────────────
+# nwt_rs:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: redshift
+#       host: "{{ env_var('REDSHIFT_HOST') }}"
+#       user: "{{ env_var('REDSHIFT_USER') }}"
+#       password: "{{ env_var('REDSHIFT_PASSWORD') }}"
+#       port: 5439
+#       database: "{{ env_var('REDSHIFT_DATABASE', 'dev') }}"
+#       schema: dbt_dev
+#       threads: 4
+#       connect_timeout: 30
+
+# ── Databricks (optional) ─────────────────────────────────────────────────
+# nwt_dbx:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: databricks
+#       catalog: main
+#       schema: dbt_dev
+#       host: "{{ env_var('DATABRICKS_HOST') }}"
+#       http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+#       token: "{{ env_var('DATABRICKS_TOKEN') }}"
+#       threads: 4

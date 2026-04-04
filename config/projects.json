@@ -6,8 +6,14 @@
       "description": "AWS Glue ETL pipeline + Snowflake + dbt star schema",
       "repo": "local",
       "tech_stack": ["AWS", "Snowflake", "Python", "SQL", "dbt"],
-      "default_assignee": "worker",
-      "priority": "high"
+      "default_assignee": "data_engineer",
+      "priority": "high",
+      "jira_projects": ["NWT", "DE"],
+      "pipelines": ["nwt_batch_load", "dbt_star_schema"],
+      "snowflake_database": "NWT_DB",
+      "snowflake_schema": "PUBLIC",
+      "s3_bucket": "nwt-data-lake",
+      "glue_job_prefix": "nwt"
     },
     {
       "id": "dashboard",
@@ -15,8 +21,12 @@
       "description": "Flask + SocketIO real-time pipeline operations dashboard",
       "repo": "local",
       "tech_stack": ["Python", "AWS", "SQL", "Snowflake"],
-      "default_assignee": "worker",
-      "priority": "high"
+      "default_assignee": "analytics_engineer",
+      "priority": "high",
+      "jira_projects": ["DASH"],
+      "pipelines": [],
+      "snowflake_database": "NWT_DB",
+      "snowflake_schema": "REPORTING"
     },
     {
       "id": "gastown_ec2",
@@ -24,8 +34,10 @@
       "description": "Gas Town installation on EC2 instances",
       "repo": "local",
       "tech_stack": ["AWS", "Python"],
-      "default_assignee": "worker",
-      "priority": "medium"
+      "default_assignee": "cloud_infra",
+      "priority": "medium",
+      "jira_projects": ["OPS"],
+      "pipelines": []
     },
     {
       "id": "mayor",
@@ -34,8 +46,17 @@
       "repo": "https://github.com/Nishant-Karri/Nishant_gastown_replica",
       "tech_stack": ["Python", "AWS", "SQL", "Snowflake", "KQL", "Informatica", "Talend", "dbt"],
       "default_assignee": "mayor",
-      "priority": "high"
+      "priority": "high",
+      "jira_projects": ["NGR", "PLATFORM"],
+      "pipelines": []
     }
   ],
-  "global_tech_stack": ["AWS", "Snowflake", "Python", "SQL", "KQL", "Informatica", "Talend", "dbt"]
+  "global_tech_stack": ["AWS", "Snowflake", "Python", "SQL", "KQL", "Informatica", "Talend", "dbt"],
+  "jira_sync": {
+    "enabled": true,
+    "auto_process_on_fetch": true,
+    "label_filter": ["ngr", "data-platform", "automated"],
+    "status_filter": ["To Do", "In Progress", "Open"],
+    "sync_interval_minutes": 30
+  }
 }

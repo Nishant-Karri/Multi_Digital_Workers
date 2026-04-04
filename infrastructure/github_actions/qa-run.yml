@@ -1,0 +1,69 @@
+name: QA Run
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # Daily at 8am UTC (after pipelines complete)
+  workflow_dispatch:
+    inputs:
+      pipeline:
+        description: Pipeline to test
+        required: true
+        default: dbt_star_schema
+
+jobs:
+  qa:
+    name: QA — ${{ github.event.inputs.pipeline || 'dbt_star_schema' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install snowflake-connector-python requests 2>/dev/null || true
+
+      - name: Generate QA artifacts
+        run: python3 integrations/qa.py generate --pipeline ${{ github.event.inputs.pipeline || 'dbt_star_schema' }}
+        env:
+          NGR_SNOWFLAKE_ACCOUNT:   ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          NGR_SNOWFLAKE_USER:      ${{ secrets.SNOWFLAKE_USER }}
+          NGR_SNOWFLAKE_PASSWORD:  ${{ secrets.SNOWFLAKE_PASSWORD }}
+          NGR_SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          NGR_SNOWFLAKE_DATABASE:  ${{ secrets.SNOWFLAKE_DATABASE }}
+          NGR_SNOWFLAKE_SCHEMA:    ${{ secrets.SNOWFLAKE_SCHEMA }}
+
+      - name: Run QA tests
+        id: qa_run
+        run: |
+          python3 integrations/qa.py run --pipeline ${{ github.event.inputs.pipeline || 'dbt_star_schema' }} | tee qa_output.txt
+          RUN_ID=$(grep "QA Run" qa_output.txt | grep -oE "QA-[A-Z0-9]+" | head -1)
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+        env:
+          NGR_SNOWFLAKE_ACCOUNT:   ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          NGR_SNOWFLAKE_USER:      ${{ secrets.SNOWFLAKE_USER }}
+          NGR_SNOWFLAKE_PASSWORD:  ${{ secrets.SNOWFLAKE_PASSWORD }}
+          NGR_SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          NGR_SNOWFLAKE_DATABASE:  ${{ secrets.SNOWFLAKE_DATABASE }}
+          NGR_SNOWFLAKE_SCHEMA:    ${{ secrets.SNOWFLAKE_SCHEMA }}
+
+      - name: Generate lineage
+        run: python3 integrations/qa.py lineage --pipeline ${{ github.event.inputs.pipeline || 'dbt_star_schema' }}
+
+      - name: Upload QA artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-artifacts-${{ steps.qa_run.outputs.run_id }}
+          path: qa_artifacts/
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          curl -H 'Content-Type: application/json' \
+               -d '{"text":"❌ QA failed for ${{ github.event.inputs.pipeline }} — check artifacts"}' \
+               ${{ secrets.TEAMS_WEBHOOK }}
