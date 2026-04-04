@@ -28,6 +28,23 @@ Usage:
   python3 ngr.py jira comment DATA-123 --text "Work started."
   python3 ngr.py jira list
 
+  python3 ngr.py investigate --pipeline nwt_batch_load
+  python3 ngr.py investigate list [--status PENDING_REVIEW]
+  python3 ngr.py investigate approve INV-ABC123 [--notes "..."]
+  python3 ngr.py investigate reject  INV-ABC123 --notes "..."
+  python3 ngr.py investigate apply   INV-ABC123
+
+  python3 ngr.py qa generate --pipeline dbt_star_schema
+  python3 ngr.py qa run      --pipeline dbt_star_schema
+  python3 ngr.py qa lineage  --pipeline dbt_star_schema
+  python3 ngr.py qa publish  --run-id QA-ABC123
+  python3 ngr.py qa full     --pipeline dbt_star_schema
+
+  python3 ngr.py infra generate [--type all|github-actions|terraform]
+  python3 ngr.py infra plan  --env dev
+  python3 ngr.py infra apply --env dev
+  python3 ngr.py infra push  --env prod
+
   python3 ngr.py alert --title "..." --body "..." [--severity HIGH] [--pipeline <name>]
 """
 
@@ -505,6 +522,90 @@ def cmd_jira(args):
         print("  ✓ JIRA connected" if ok else "  ✗ JIRA connection failed")
 
 
+# ── Investigate ───────────────────────────────────────────────────────────────
+
+def cmd_investigate(args):
+    from integrations.investigator import InvestigationEngine
+
+    PIPELINE_TABLES = {
+        "nwt_batch_load":  ["NWT_ORDER_FILE", "NWT_ORDER_PRODUCT_FILE", "NWT_STORE_FILE"],
+        "dbt_star_schema": ["FACT_ORDER", "DIM_STORE", "DIM_DATE", "DIM_DAYPART"],
+        "all":             ["NWT_ORDER_FILE", "FACT_ORDER", "DIM_STORE", "DIM_DATE"],
+    }
+
+    engine = InvestigationEngine()
+    sub = args.inv_cmd
+
+    if sub == "run" or sub is None:
+        pipeline = args.pipeline
+        tables   = PIPELINE_TABLES.get(pipeline, [])
+        engine.run_investigation(
+            pipeline   = pipeline,
+            tables     = tables,
+            database   = getattr(args, "database", "NISHANT_DS_DB"),
+            schema     = getattr(args, "schema",   "NISHANT_WORKFLOW_TEST"),
+            auto_alert = not getattr(args, "no_alert", False),
+        )
+    elif sub == "list":
+        engine.print_list(getattr(args, "status", None))
+    elif sub == "show":
+        inv = engine._load(args.id)
+        print(json.dumps(inv, indent=2, default=str) if inv else f"Not found: {args.id}")
+    elif sub == "approve":
+        engine.approve(args.id, notes=args.notes, approved_by=getattr(args,"by","human"))
+    elif sub == "reject":
+        engine.reject(args.id, notes=args.notes)
+    elif sub == "apply":
+        engine.apply_fixes(args.id, push_to_git=not getattr(args, "no_push", False))
+
+
+# ── QA ────────────────────────────────────────────────────────────────────────
+
+def cmd_qa(args):
+    from integrations.qa import QAEngine
+    engine = QAEngine()
+    sub    = args.qa_cmd
+
+    if sub == "generate":
+        engine.generate(args.pipeline)
+    elif sub == "run":
+        engine.run(args.pipeline)
+    elif sub == "lineage":
+        engine.lineage(args.pipeline)
+    elif sub == "publish":
+        engine.publish(args.run_id)
+    elif sub == "full":
+        engine.generate(args.pipeline)
+        run = engine.run(args.pipeline)
+        engine.lineage(args.pipeline)
+        if run:
+            engine.publish(run["run_id"])
+
+
+# ── Infra ─────────────────────────────────────────────────────────────────────
+
+def cmd_infra(args):
+    from integrations.cicd import CICDGenerator
+    gen = CICDGenerator()
+    sub = args.infra_cmd
+
+    if sub == "generate":
+        t = getattr(args, "type", "all")
+        if t in ("all", "github-actions"):
+            gen.generate_github_actions()
+        if t in ("all", "terraform"):
+            gen.generate_terraform()
+        gen._write_gitignore_infra()
+    elif sub == "plan":
+        gen.terraform_plan(args.env)
+    elif sub == "apply":
+        gen.terraform_apply(args.env)
+    elif sub == "push":
+        gen.push_to_git(args.env)
+    else:
+        gen.generate_all()
+
+
 # ── Alert ─────────────────────────────────────────────────────────────────────
 
 def cmd_alert(args):
@@ -652,6 +753,51 @@ def main():
     js.add_parser("projects")
     js.add_parser("test")
 
+    # investigate
+    invp = sub.add_parser("investigate")
+    invsub = invp.add_subparsers(dest="inv_cmd")
+    inv_run = invsub.add_parser("run")
+    inv_run.add_argument("--pipeline", required=True)
+    inv_run.add_argument("--database", default="NISHANT_DS_DB")
+    inv_run.add_argument("--schema",   default="NISHANT_WORKFLOW_TEST")
+    inv_run.add_argument("--no-alert", action="store_true")
+    invp.add_argument("--pipeline", nargs="?")  # direct: ngr.py investigate --pipeline X
+    invp.add_argument("--database", default="NISHANT_DS_DB")
+    invp.add_argument("--schema",   default="NISHANT_WORKFLOW_TEST")
+    invp.add_argument("--no-alert", action="store_true")
+    inv_list = invsub.add_parser("list")
+    inv_list.add_argument("--status", nargs="?")
+    inv_show = invsub.add_parser("show")
+    inv_show.add_argument("id")
+    inv_app = invsub.add_parser("approve")
+    inv_app.add_argument("id")
+    inv_app.add_argument("--notes", default="Approved")
+    inv_app.add_argument("--by",    default="human")
+    inv_rej = invsub.add_parser("reject")
+    inv_rej.add_argument("id")
+    inv_rej.add_argument("--notes", required=True)
+    inv_fix = invsub.add_parser("apply")
+    inv_fix.add_argument("id")
+    inv_fix.add_argument("--no-push", action="store_true")
+
+    # qa
+    qap  = sub.add_parser("qa")
+    qas  = qap.add_subparsers(dest="qa_cmd")
+    for qa_sub in ["generate","run","lineage"]:
+        qp = qas.add_parser(qa_sub)
+        qp.add_argument("--pipeline", required=True)
+    qas.add_parser("publish").add_argument("--run-id", required=True)
+    qas.add_parser("full").add_argument("--pipeline", required=True)
+
+    # infra
+    infp = sub.add_parser("infra")
+    infs = infp.add_subparsers(dest="infra_cmd")
+    inf_gen = infs.add_parser("generate")
+    inf_gen.add_argument("--type", choices=["all","github-actions","terraform"], default="all")
+    infs.add_parser("plan").add_argument("--env",  default="dev")
+    infs.add_parser("apply").add_argument("--env", default="dev")
+    infs.add_parser("push").add_argument("--env",  default="prod")
+
     # alert
     alp = sub.add_parser("alert")
     alp.add_argument("--title",    required=True)
@@ -665,14 +811,17 @@ def main():
     args = parser.parse_args()
 
     dispatch = {
-        "status":  cmd_status,
-        "tasks":   cmd_tasks,
-        "mail":    cmd_mail,
-        "review":  cmd_review,
-        "history": cmd_history,
-        "spawn":   cmd_spawn,
-        "jira":    cmd_jira,
-        "alert":   cmd_alert,
+        "status":      cmd_status,
+        "tasks":       cmd_tasks,
+        "mail":        cmd_mail,
+        "review":      cmd_review,
+        "history":     cmd_history,
+        "spawn":       cmd_spawn,
+        "jira":        cmd_jira,
+        "investigate": cmd_investigate,
+        "qa":          cmd_qa,
+        "infra":       cmd_infra,
+        "alert":       cmd_alert,
     }
 
     fn = dispatch.get(args.cmd)
