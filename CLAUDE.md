@@ -22,20 +22,49 @@ Nishant_gastown_replica/
 ├── CLAUDE.md              ← Town root identity (this file)
 ├── ngr.py                 ← CLI: task/mail/agent management
 ├── agents/
-│   ├── mayor/CLAUDE.md    ← Mayor role (global orchestrator)
-│   ├── worker/CLAUDE.md   ← Worker role (executes tasks)
-│   ├── monitor/CLAUDE.md  ← Monitor role (observability)
-│   └── refinery/CLAUDE.md ← Refinery role (code review/merge)
+│   ├── mayor/              ← Global orchestrator
+│   ├── worker/             ← General task executor
+│   ├── monitor/            ← Observability (data checks)
+│   ├── refinery/           ← Code review / merge
+│   ├── reliability/        ← Incident management, SLO, alerting  ← NEW
+│   ├── data_engineer/      ← Ingestion, ETL, migration
+│   ├── analytics_engineer/ ← dbt, SQL, semantic layer
+│   ├── streaming_engineer/ ← Kafka, Kinesis, real-time
+│   ├── data_scientist/     ← ML, features, MLOps
+│   ├── analytics/          ← Dashboards, KQL, EDA
+│   ├── governance/         ← Lineage, catalog, PII, RBAC
+│   ├── dataops/            ← Airflow, CI/CD
+│   ├── cloud_infra/        ← AWS/Azure/GCP, cost
+│   └── data_quality/       ← GE, dbt tests, anomaly detection
+├── integrations/
+│   ├── jira.py             ← JIRA REST API client (Cloud + Server)  ← NEW
+│   ├── ticket_processor.py ← JIRA ticket → task + instruction.md    ← NEW
+│   ├── alerts.py           ← Teams + Slack + Outlook alerting        ← NEW
+│   └── reliability.py      ← Incident management + SLO tracking      ← NEW
+├── domains/
+│   ├── registry.py         ← 26-domain registry (all data work)
+│   └── tasks.py            ← Task templates per domain
+├── connectors/
+│   └── registry.py         ← ConnectorRegistry for 25 platforms
+├── observability/
+│   ├── observer.py         ← Freshness, row counts, nulls, schema, comparisons
+│   └── config.json         ← Layer + check configuration
 ├── config/
-│   ├── agents.json        ← Agent registry
-│   ├── projects.json      ← Your projects
-│   └── routing.json       ← Task routing rules
+│   ├── agents.json         ← Agent registry
+│   ├── projects.json       ← Your projects (with jira_projects mapping)
+│   ├── routing.json        ← Task routing rules
+│   └── scaling.json        ← Pool + worker role config
+├── vault/
+│   ├── vault.py            ← 3-backend credential vault
+│   └── env.template        ← All env var names (no values)
 ├── tasks/
-│   ├── inbox/             ← New tasks (JSON files)
-│   ├── active/            ← In-progress tasks
-│   └── completed/         ← Done tasks
-├── mail/                  ← Inter-agent messages
-└── history/               ← Run history (JSON)
+│   ├── inbox/              ← New tasks (JSON files)
+│   ├── active/             ← In-progress tasks
+│   ├── completed/          ← Done tasks
+│   └── instructions/       ← Auto-generated instruction.md per task  ← NEW
+├── tasks/incidents/        ← Active + resolved incidents              ← NEW
+├── mail/                   ← Inter-agent messages
+└── history/                ← Run history (JSON)
 ```
 
 ## Multi-Agent Pattern

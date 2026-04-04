@@ -20,6 +20,15 @@ Usage:
   python3 ngr.py review reject <task_id> --notes "..."
   python3 ngr.py history [--limit 20] [--status failed]
   python3 ngr.py spawn <agent_role> --task <task_id>
+
+  python3 ngr.py jira sync --project DATA [--status "To Do"] [--max 50]
+  python3 ngr.py jira fetch DATA-123
+  python3 ngr.py jira execute DATA-123
+  python3 ngr.py jira update DATA-123 --status "In Progress" [--comment "..."]
+  python3 ngr.py jira comment DATA-123 --text "Work started."
+  python3 ngr.py jira list
+
+  python3 ngr.py alert --title "..." --body "..." [--severity HIGH] [--pipeline <name>]
 """
 
 import argparse
@@ -380,6 +389,138 @@ def cmd_history(args):
         print(f"{r.get('task_id','?'):12s} {r.get('status','?'):10s} {r.get('title','?')}")
 
 
+# ── JIRA ─────────────────────────────────────────────────────────────────────
+
+def cmd_jira(args):
+    sub = args.jira_cmd
+
+    if sub == "sync":
+        # Fetch open tickets from JIRA and create NGR tasks + instruction.md
+        from integrations.jira import JiraClient
+        from integrations.ticket_processor import TicketProcessor
+        client = JiraClient()
+        proc   = TicketProcessor()
+
+        project    = args.project
+        status     = getattr(args, "status", None)
+        max_r      = getattr(args, "max", 50)
+        issue_type = getattr(args, "type", None)
+
+        if status:
+            tickets = client.get_project_tickets(project, status=status,
+                                                  issue_type=issue_type, max_results=max_r)
+        else:
+            tickets = client.get_open_tickets(project, max_results=max_r)
+
+        print(f"\n  Syncing {len(tickets)} tickets from {project}...\n")
+        task_ids = proc.process_bulk(tickets)
+        print(f"\n  ✓ Synced {len(task_ids)} tasks. Run: python3 ngr.py tasks ready")
+
+    elif sub == "fetch":
+        # Fetch and display a single JIRA ticket
+        from integrations.jira import JiraClient
+        client = JiraClient()
+        ticket = client.get_ticket(args.ticket_key)
+        print(f"\n  [{ticket['priority']}] {ticket['key']}: {ticket['summary']}")
+        print(f"  Status:   {ticket['status']}")
+        print(f"  Reporter: {ticket['reporter']}")
+        print(f"  Labels:   {', '.join(ticket['labels']) or '—'}")
+        print(f"  URL:      {ticket['url']}")
+        print(f"\n  Description:\n  {ticket['description'][:500]}")
+
+    elif sub == "execute":
+        # Fetch ticket → create task + instruction.md → print agent spawn instructions
+        from integrations.jira import JiraClient
+        from integrations.ticket_processor import TicketProcessor
+        client  = JiraClient()
+        proc    = TicketProcessor()
+        ticket  = client.get_ticket(args.ticket_key)
+        task_id = proc.process_dict(ticket)
+
+        # Load task to get agent role
+        task_file = TASKS_INBOX / f"{task_id}.json"
+        if task_file.exists():
+            task = load_json(task_file)
+            agent_role  = task.get("agent_role", "worker")
+            domain      = task.get("domain", "—")
+            instr_path  = task.get("instruction_md", "")
+
+            print(f"\n  ✓ Task created: {task_id}")
+            print(f"  Domain:  {domain}")
+            print(f"  Agent:   {agent_role}")
+            print(f"  Instructions: {instr_path}")
+            print(f"\n  To execute, spawn the {agent_role} agent:")
+            print(f"  python3 ngr.py spawn {agent_role} --task {task_id}")
+
+            # Transition JIRA ticket to In Progress
+            try:
+                client.transition(args.ticket_key, "In Progress")
+                client.comment(args.ticket_key, f"Picked up by NGR agent. Task ID: {task_id}")
+                print(f"  ✓ JIRA {args.ticket_key} → In Progress")
+            except Exception as e:
+                print(f"  [JIRA] Could not transition: {e}")
+
+    elif sub == "update":
+        from integrations.jira import JiraClient
+        client = JiraClient()
+        if args.jira_status:
+            client.transition(args.ticket_key, args.jira_status)
+            print(f"  ✓ {args.ticket_key} → {args.jira_status}")
+        if args.comment:
+            client.comment(args.ticket_key, args.comment)
+            print(f"  ✓ Comment added to {args.ticket_key}")
+
+    elif sub == "comment":
+        from integrations.jira import JiraClient
+        JiraClient().comment(args.ticket_key, args.text)
+        print(f"  ✓ Comment added to {args.ticket_key}")
+
+    elif sub == "list":
+        # List locally synced JIRA tasks
+        all_tasks = []
+        for d in [TASKS_INBOX, TASKS_ACTIVE, TASKS_DONE]:
+            for f in sorted(d.glob("JIRA-*.json")):
+                t = load_json(f)
+                all_tasks.append(t)
+        if not all_tasks:
+            print("No JIRA tasks synced. Run: python3 ngr.py jira sync --project <KEY>")
+            return
+        print(f"\n  {'NGR ID':18s} {'JIRA':12s} {'STATUS':10s} {'PRIORITY':8s} {'TITLE'}")
+        print("  " + "-" * 80)
+        for t in all_tasks:
+            print(
+                f"  {t.get('id','?'):18s} {t.get('jira_key','?'):12s} "
+                f"{t.get('status','?'):10s} {t.get('priority','?'):8s} "
+                f"{t.get('title','?')[:50]}"
+            )
+
+    elif sub == "projects":
+        from integrations.jira import JiraClient
+        for p in JiraClient().get_projects():
+            print(f"  {p['key']:10s}  {p['name']}")
+
+    elif sub == "test":
+        from integrations.jira import JiraClient
+        ok = JiraClient().health_check()
+        print("  ✓ JIRA connected" if ok else "  ✗ JIRA connection failed")
+
+
+# ── Alert ─────────────────────────────────────────────────────────────────────
+
+def cmd_alert(args):
+    from integrations.alerts import AlertEngine, Alert, Severity
+    engine = AlertEngine()
+    print(f"  Channels: {engine.configured_channels}")
+    engine.send(Alert(
+        title    = args.title,
+        body     = args.body,
+        severity = Severity[args.severity.upper()],
+        source   = getattr(args, "source", "ngr"),
+        pipeline = getattr(args, "pipeline", ""),
+        ticket   = getattr(args, "ticket", ""),
+    ))
+
+
 # ── Spawn (instructions for Mayor) ───────────────────────────────────────────
 
 def cmd_spawn(args):
@@ -479,8 +620,47 @@ def main():
 
     # spawn
     sp = sub.add_parser("spawn")
-    sp.add_argument("agent_role", choices=["worker","monitor","refinery"])
+    sp.add_argument("agent_role")
     sp.add_argument("--task")
+
+    # jira
+    jp  = sub.add_parser("jira")
+    js  = jp.add_subparsers(dest="jira_cmd")
+
+    j_sync = js.add_parser("sync")
+    j_sync.add_argument("--project", required=True)
+    j_sync.add_argument("--status")
+    j_sync.add_argument("--type")
+    j_sync.add_argument("--max", type=int, default=50)
+
+    j_fetch = js.add_parser("fetch")
+    j_fetch.add_argument("ticket_key")
+
+    j_exec = js.add_parser("execute")
+    j_exec.add_argument("ticket_key")
+
+    j_upd = js.add_parser("update")
+    j_upd.add_argument("ticket_key")
+    j_upd.add_argument("--status", dest="jira_status", default="")
+    j_upd.add_argument("--comment", default="")
+
+    j_comment = js.add_parser("comment")
+    j_comment.add_argument("ticket_key")
+    j_comment.add_argument("--text", required=True)
+
+    js.add_parser("list")
+    js.add_parser("projects")
+    js.add_parser("test")
+
+    # alert
+    alp = sub.add_parser("alert")
+    alp.add_argument("--title",    required=True)
+    alp.add_argument("--body",     required=True)
+    alp.add_argument("--severity", default="HIGH",
+                     choices=["CRITICAL","HIGH","MEDIUM","LOW","RESOLVED"])
+    alp.add_argument("--pipeline", default="")
+    alp.add_argument("--ticket",   default="")
+    alp.add_argument("--source",   default="ngr")
 
     args = parser.parse_args()
 
@@ -491,6 +671,8 @@ def main():
         "review":  cmd_review,
         "history": cmd_history,
         "spawn":   cmd_spawn,
+        "jira":    cmd_jira,
+        "alert":   cmd_alert,
     }
 
     fn = dispatch.get(args.cmd)

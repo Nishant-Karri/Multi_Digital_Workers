@@ -121,6 +121,35 @@ class EnvBackend:
             "GOOGLE_APPLICATION_CREDENTIALS",
             "NGR_GCP_PROJECT",
         ],
+        "jira": [
+            "NGR_JIRA_BASE_URL",
+            "NGR_JIRA_USER",
+            "NGR_JIRA_TOKEN",
+            "NGR_JIRA_API_VERSION",
+            "NGR_JIRA_INCIDENT_PROJECT",
+        ],
+        "teams": [
+            "NGR_TEAMS_WEBHOOK",
+        ],
+        "slack": [
+            "NGR_SLACK_WEBHOOK",
+            "NGR_SLACK_BOT_TOKEN",
+            "NGR_SLACK_ALERT_CHANNEL",
+        ],
+        "smtp": [
+            "NGR_SMTP_HOST",
+            "NGR_SMTP_PORT",
+            "NGR_SMTP_USER",
+            "NGR_SMTP_PASSWORD",
+            "NGR_SMTP_FROM",
+            "NGR_ALERT_EMAILS",
+        ],
+        "graph": [
+            "NGR_GRAPH_TENANT_ID",
+            "NGR_GRAPH_CLIENT_ID",
+            "NGR_GRAPH_CLIENT_SECRET",
+            "NGR_GRAPH_SENDER_EMAIL",
+        ],
         "anthropic": [
             "ANTHROPIC_API_KEY",
         ],

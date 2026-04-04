@@ -427,6 +427,164 @@ sf_raw  = v.get("snowflake")
 
 ---
 
+## JIRA
+
+**Get API token:** https://id.atlassian.com/manage-profile/security/api-tokens
+
+```bash
+# Test connection
+python3 integrations/jira.py test
+
+# Set via env
+export NGR_JIRA_BASE_URL="https://yourcompany.atlassian.net"
+export NGR_JIRA_USER="your-email@company.com"
+export NGR_JIRA_TOKEN="your-api-token"
+
+# Or via vault
+python3 vault/vault.py set jira '{
+  "base_url": "https://yourcompany.atlassian.net",
+  "user": "your-email@company.com",
+  "token": "your-api-token",
+  "api_version": "3"
+}'
+```
+
+**JIRA Server / Data Center:**
+```bash
+python3 vault/vault.py set jira '{
+  "base_url": "https://jira.yourcompany.com",
+  "user": "your-username",
+  "token": "your-password",
+  "api_version": "2"
+}'
+```
+
+**Usage:**
+```bash
+python3 ngr.py jira test                          # verify connection
+python3 ngr.py jira projects                      # list accessible projects
+python3 ngr.py jira sync --project DATA           # sync all open tickets
+python3 ngr.py jira sync --project DATA --status "To Do" --max 20
+python3 ngr.py jira fetch DATA-123                # view single ticket
+python3 ngr.py jira execute DATA-123              # fetch + create task + instruction.md
+python3 ngr.py jira update DATA-123 --status "In Progress" --comment "Starting work"
+python3 ngr.py jira list                          # list synced tickets
+```
+
+---
+
+## Microsoft Teams Alerts
+
+**Setup:** Teams channel → `···` → Connectors → Incoming Webhook → Configure → Copy URL
+
+```bash
+export NGR_TEAMS_WEBHOOK="https://yourcompany.webhook.office.com/webhookb2/..."
+
+# Test
+python3 integrations/alerts.py --channel teams --severity HIGH
+```
+
+---
+
+## Slack Alerts
+
+**Option A — Incoming Webhook (simple):**
+1. Go to api.slack.com/apps → Create App → Incoming Webhooks → Add New Webhook
+2. Copy the webhook URL
+
+```bash
+export NGR_SLACK_WEBHOOK="https://hooks.slack.com/services/T.../B.../...."
+
+# Test
+python3 integrations/alerts.py --channel slack --severity HIGH
+```
+
+**Option B — Bot Token (post to any channel):**
+1. api.slack.com/apps → Create App → OAuth & Permissions → Bot Token Scopes: `chat:write`
+2. Install app to workspace → copy Bot Token (xoxb-...)
+
+```bash
+export NGR_SLACK_BOT_TOKEN="xoxb-..."
+export NGR_SLACK_ALERT_CHANNEL="#data-alerts"
+```
+
+---
+
+## Email / Outlook Alerts
+
+**Option A — SMTP (Office 365):**
+```bash
+export NGR_SMTP_HOST="smtp.office365.com"
+export NGR_SMTP_PORT="587"
+export NGR_SMTP_USER="alerts@yourcompany.com"
+export NGR_SMTP_PASSWORD="your-app-password"   # NOT your login password
+export NGR_SMTP_FROM="alerts@yourcompany.com"
+export NGR_ALERT_EMAILS="oncall@yourcompany.com,dataplatform@yourcompany.com"
+
+# Test
+python3 integrations/alerts.py --channel email --severity MEDIUM
+```
+
+> **Office 365 app password:** Microsoft 365 Admin → Users → your user → Mail → Email apps → Enable SMTP AUTH
+
+**Option B — Microsoft Graph API (if SMTP is disabled on your tenant):**
+
+1. Azure Portal → App Registrations → New Registration
+2. API Permissions → Add: `Mail.Send` (Application, not Delegated)
+3. Grant admin consent
+4. Certificates & Secrets → New client secret → copy value
+
+```bash
+export NGR_GRAPH_TENANT_ID="your-tenant-id"
+export NGR_GRAPH_CLIENT_ID="your-app-client-id"
+export NGR_GRAPH_CLIENT_SECRET="your-client-secret"
+export NGR_GRAPH_SENDER_EMAIL="alerts@yourcompany.com"
+export NGR_ALERT_EMAILS="oncall@yourcompany.com"
+```
+
+**Via vault:**
+```bash
+python3 vault/vault.py set graph '{
+  "tenant_id": "...", "client_id": "...",
+  "client_secret": "...", "sender_email": "alerts@yourcompany.com"
+}'
+```
+
+---
+
+## Testing All Alert Channels
+
+```bash
+# Test all configured channels at once
+python3 integrations/alerts.py --severity HIGH --title "NGR Test Alert"
+
+# Or via ngr CLI
+python3 ngr.py alert \
+  --title "Test: Pipeline health check" \
+  --body "All systems nominal. This is a test." \
+  --severity MEDIUM
+```
+
+---
+
+## Data Reliability Agent
+
+```bash
+# Full pipeline health check
+python3 integrations/reliability.py monitor
+
+# SLO compliance report
+python3 integrations/reliability.py slo --days 30
+
+# Incident management
+python3 integrations/reliability.py incident open --title "..." --severity P2-HIGH --pipeline nwt_batch_load
+python3 integrations/reliability.py incident list
+python3 integrations/reliability.py incident update INC-ABC123 --status RESOLVED --notes "Fixed."
+python3 integrations/reliability.py incident rca INC-ABC123 --cause "API throttling" --category dependency_failure
+```
+
+---
+
 ## Security Rules
 
 1. **Never put credentials in code or config files** — use the vault
