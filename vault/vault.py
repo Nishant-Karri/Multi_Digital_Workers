@@ -74,6 +74,53 @@ class EnvBackend:
             "NGR_DBT_PROFILES_DIR",
             "NGR_DBT_TARGET",
         ],
+        "kafka": [
+            "NGR_KAFKA_BOOTSTRAP_SERVERS",
+            "NGR_KAFKA_SASL_MECHANISM",
+            "NGR_KAFKA_SECURITY_PROTOCOL",
+            "NGR_KAFKA_SASL_USERNAME",
+            "NGR_KAFKA_SASL_PASSWORD",
+            "NGR_KAFKA_GROUP_ID",
+        ],
+        "databricks": [
+            "NGR_DATABRICKS_HOST",
+            "NGR_DATABRICKS_HTTP_PATH",
+            "NGR_DATABRICKS_TOKEN",
+        ],
+        "mlflow": [
+            "NGR_MLFLOW_TRACKING_URI",
+            "NGR_MLFLOW_USERNAME",
+            "NGR_MLFLOW_PASSWORD",
+        ],
+        "airflow": [
+            "NGR_AIRFLOW_BASE_URL",
+            "NGR_AIRFLOW_USER",
+            "NGR_AIRFLOW_PASSWORD",
+        ],
+        "datahub": [
+            "NGR_DATAHUB_SERVER",
+            "NGR_DATAHUB_TOKEN",
+        ],
+        "collibra": [
+            "NGR_COLLIBRA_BASE_URL",
+            "NGR_COLLIBRA_USER",
+            "NGR_COLLIBRA_PASSWORD",
+        ],
+        "feast": [
+            "NGR_FEAST_REPO_PATH",
+        ],
+        "azure_ml": [
+            "NGR_AZURE_ML_SUBSCRIPTION_ID",
+            "NGR_AZURE_ML_RESOURCE_GROUP",
+            "NGR_AZURE_ML_WORKSPACE_NAME",
+            "NGR_AZURE_ML_TENANT_ID",
+            "NGR_AZURE_ML_CLIENT_ID",
+            "NGR_AZURE_ML_CLIENT_SECRET",
+        ],
+        "gcp": [
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "NGR_GCP_PROJECT",
+        ],
         "anthropic": [
             "ANTHROPIC_API_KEY",
         ],

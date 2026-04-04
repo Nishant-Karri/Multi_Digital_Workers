@@ -18,10 +18,15 @@
     "keywords_epic":  ["etl", "data warehouse", "multi-step", "phases", "sprint", "overhaul"]
   },
   "worker_roles": {
-    "data":    { "handles": ["sql", "snowflake", "dbt", "etl", "kql"],          "description": "Data engineering tasks" },
-    "infra":   { "handles": ["aws", "ec2", "s3", "glue", "ssm", "terraform"],   "description": "Infrastructure tasks" },
-    "code":    { "handles": ["python", "bug", "feature", "api", "dashboard"],    "description": "Software development tasks" },
-    "review":  { "handles": ["review", "qa", "test", "validate"],               "description": "Quality and review tasks" },
-    "general": { "handles": ["*"],                                               "description": "Catch-all worker" }
+    "data_engineer":        { "handles": ["batch_ingestion","streaming_ingestion","api_ingestion","database_replication","spark_transformation","sql_transformation","data_wrangling","data_migration","reverse_etl"], "description": "Ingestion, transformation, migration" },
+    "analytics_engineer":   { "handles": ["dbt_modeling","sql_transformation"],                                                       "description": "dbt models, semantic layer, SQL" },
+    "streaming_engineer":   { "handles": ["streaming_ingestion"],                                                                      "description": "Kafka, Kinesis, Flink, real-time" },
+    "data_scientist":       { "handles": ["feature_engineering","model_training","mlops"],                                             "description": "ML, features, MLOps" },
+    "analytics":            { "handles": ["bi_report","kql_analytics","ad_hoc_analysis"],                                              "description": "Dashboards, KQL, EDA" },
+    "governance":           { "handles": ["data_lineage","data_catalog","data_privacy","access_control","data_sharing"],               "description": "Lineage, catalog, PII, RBAC" },
+    "dataops":              { "handles": ["pipeline_orchestration","cicd_data"],                                                       "description": "Airflow, Prefect, CI/CD" },
+    "cloud_infra":          { "handles": ["cloud_data_infra","cost_optimization"],                                                     "description": "AWS/Azure/GCP infra, cost" },
+    "data_quality":         { "handles": ["data_quality","data_profiling","anomaly_detection"],                                        "description": "GE, dbt tests, anomaly detection" },
+    "general":              { "handles": ["*"],                                                                                        "description": "Catch-all for unclassified tasks" }
   }
 }
