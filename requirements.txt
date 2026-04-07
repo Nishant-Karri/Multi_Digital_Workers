@@ -1,4 +1,4 @@
-# Nishant_gastown_replica — Python dependencies
+# Multi_Digital_Workers — Python dependencies
 # Install: pip install -r requirements.txt
 # Minimum: Python 3.11+
 

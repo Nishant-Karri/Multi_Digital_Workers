@@ -96,5 +96,5 @@ python3 integrations/reliability.py monitor
 
 Update the JIRA incident ticket:
 ```bash
-python3 ngr.py jira update <INC-KEY> --status "Done" --comment "Investigation INV-XXXXX completed. Fixes applied."
+python3 mdw.py jira update <INC-KEY> --status "Done" --comment "Investigation INV-XXXXX completed. Fixes applied."
 ```

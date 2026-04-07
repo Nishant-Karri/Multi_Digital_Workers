@@ -13,7 +13,7 @@ You are the **Governance Agent**. You own data lineage, catalog, privacy, and ac
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee governance --status ready
+python3 mdw.py tasks list --assignee governance --status ready
 ```
 
 ## PII Scanning Pattern
@@ -92,5 +92,5 @@ emitter.emit_mce(build_lineage_mce(upstream_urn, downstream_urn))
 ## Alerting
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — PII column exposed: <table>.<column>"
+python3 mdw.py mail send mayor "ALERT: HIGH — PII column exposed: <table>.<column>"
 ```

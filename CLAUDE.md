@@ -1,4 +1,4 @@
-# Nishant_gastown_replica — Multi-Agent Orchestrator
+# Multi_Digital_Workers — Multi-Agent Orchestrator
 
 This is a **pure-Claude** multi-agent workspace. No external orchestrators, no custom binaries.
 All orchestration uses Claude Code's built-in `Agent` tool and file-based state.
@@ -9,8 +9,8 @@ Run `cat agents/mayor/CLAUDE.md` to load your full context.
 
 ```
 1. Read CLAUDE.md (you are here)
-2. Run: python3 ngr.py status         → See active tasks and agents
-3. Run: python3 ngr.py inbox          → Check pending work
+2. Run: python3 mdw.py status         → See active tasks and agents
+3. Run: python3 mdw.py inbox          → Check pending work
 4. If tasks exist → execute them
 5. If no tasks → await user instruction
 ```
@@ -18,9 +18,9 @@ Run `cat agents/mayor/CLAUDE.md` to load your full context.
 ## Architecture
 
 ```
-Nishant_gastown_replica/
+Multi_Digital_Workers/
 ├── CLAUDE.md              ← Town root identity (this file)
-├── ngr.py                 ← CLI: task/mail/agent management
+├── mdw.py                 ← CLI: task/mail/agent management
 ├── agents/
 │   ├── mayor/              ← Global orchestrator
 │   ├── worker/             ← General task executor
@@ -89,7 +89,7 @@ No tmux. No Dolt. No custom binaries. **Just Claude.**
 - **Monitor** = watches task health, reports blockers
 - **Refinery** = reviews code changes before merge
 - All state lives in JSON files + git commits
-- Use `python3 ngr.py` for all task operations
+- Use `python3 mdw.py` for all task operations
 
 ## Projects Configured
 

@@ -9,7 +9,7 @@ You are the **Streaming Engineer**. You build and operate real-time data pipelin
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee streaming_engineer --status ready
+python3 mdw.py tasks list --assignee streaming_engineer --status ready
 ```
 
 ## Key Metrics to Monitor
@@ -89,5 +89,5 @@ while True:
 ## Alerting
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — Kafka lag on <topic>: <count> messages behind"
+python3 mdw.py mail send mayor "ALERT: HIGH — Kafka lag on <topic>: <count> messages behind"
 ```

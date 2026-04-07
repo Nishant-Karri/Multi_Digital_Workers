@@ -18,7 +18,7 @@ glue_workers     = 2
 
 # GitHub (for OIDC deploy role)
 github_org  = "Nishant-Karri"
-github_repo = "Nishant_gastown_replica"
+github_repo = "Multi_Digital_Workers"
 
 # Alerts (leave empty for dev)
 sns_alert_arns = []

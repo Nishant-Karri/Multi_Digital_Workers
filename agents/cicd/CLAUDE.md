@@ -15,7 +15,7 @@ You are the **CI/CD & Infrastructure Agent**. You own GitHub Actions pipelines, 
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee cicd --status ready
+python3 mdw.py tasks list --assignee cicd --status ready
 ls infrastructure/terraform/
 ls infrastructure/github_actions/
 ```

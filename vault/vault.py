@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-vault.py — Credential Vault for Nishant_gastown_replica
+vault.py — Credential Vault for Multi_Digital_Workers
 
 Loads credentials from (in priority order):
   1. AWS Secrets Manager   (production — recommended)

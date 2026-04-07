@@ -53,11 +53,11 @@ python3 integrations/qa.py publish --run-id QA-ABC123
 
 ### Via ngr CLI
 ```bash
-python3 ngr.py qa generate --pipeline dbt_star_schema
-python3 ngr.py qa run      --pipeline dbt_star_schema
-python3 ngr.py qa lineage  --pipeline dbt_star_schema
-python3 ngr.py qa publish  --run-id QA-ABC123
-python3 ngr.py qa full     --pipeline dbt_star_schema
+python3 mdw.py qa generate --pipeline dbt_star_schema
+python3 mdw.py qa run      --pipeline dbt_star_schema
+python3 mdw.py qa lineage  --pipeline dbt_star_schema
+python3 mdw.py qa publish  --run-id QA-ABC123
+python3 mdw.py qa full     --pipeline dbt_star_schema
 ```
 
 ## QA Pass Criteria
@@ -107,4 +107,4 @@ git show qa/dbt_star_schema/qa-abc123
 1. `python3 integrations/qa.py full --pipeline nwt_batch_load`
 2. `python3 integrations/qa.py full --pipeline dbt_star_schema`
 3. Review lineage docs for any undocumented changes
-4. Send QA summary: `python3 ngr.py mail send mayor "QA Week complete: <pass_rate>% pass rate"`
+4. Send QA summary: `python3 mdw.py mail send mayor "QA Week complete: <pass_rate>% pass rate"`

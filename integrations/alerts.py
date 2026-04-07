@@ -406,7 +406,7 @@ class OutlookAlerter:
     </tr>
     <tr>
       <td style="padding:8px 20px; font-size:12px; color:#9ca3af;">
-        Sent by Nishant_gastown_replica · NGR Data Reliability Agent
+        Sent by Multi_Digital_Workers · MDW Data Reliability Agent
       </td>
     </tr>
   </table>
@@ -571,7 +571,7 @@ if __name__ == "__main__":
     p.add_argument("--severity", default="HIGH",
                    choices=["CRITICAL","HIGH","MEDIUM","LOW","RESOLVED"])
     p.add_argument("--title",  default="Test Alert from NGR")
-    p.add_argument("--body",   default="This is a test alert from the NGR alerting engine.")
+    p.add_argument("--body",   default="This is a test alert from the MDW alerting engine.")
     p.add_argument("--channel", choices=["teams","slack","email","all"], default="all")
     args = p.parse_args()
 
@@ -590,6 +590,6 @@ if __name__ == "__main__":
         severity = Severity[args.severity],
         source   = "ngr-test",
         metrics  = {"test_metric": 42},
-        links    = {"NGR Repo": "https://github.com/Nishant-Karri/Nishant_gastown_replica"},
+        links    = {"NGR Repo": "https://github.com/Nishant-Karri/Multi_Digital_Workers"},
     ))
     print(f"\nResults: {results}")

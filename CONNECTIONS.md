@@ -1,4 +1,4 @@
-# Connections Guide — Nishant_gastown_replica
+# Connections Guide — Multi_Digital_Workers
 
 How to securely connect to every tech stack. No credentials are stored in this repo.
 
@@ -461,14 +461,14 @@ python3 vault/vault.py set jira '{
 
 **Usage:**
 ```bash
-python3 ngr.py jira test                          # verify connection
-python3 ngr.py jira projects                      # list accessible projects
-python3 ngr.py jira sync --project DATA           # sync all open tickets
-python3 ngr.py jira sync --project DATA --status "To Do" --max 20
-python3 ngr.py jira fetch DATA-123                # view single ticket
-python3 ngr.py jira execute DATA-123              # fetch + create task + instruction.md
-python3 ngr.py jira update DATA-123 --status "In Progress" --comment "Starting work"
-python3 ngr.py jira list                          # list synced tickets
+python3 mdw.py jira test                          # verify connection
+python3 mdw.py jira projects                      # list accessible projects
+python3 mdw.py jira sync --project DATA           # sync all open tickets
+python3 mdw.py jira sync --project DATA --status "To Do" --max 20
+python3 mdw.py jira fetch DATA-123                # view single ticket
+python3 mdw.py jira execute DATA-123              # fetch + create task + instruction.md
+python3 mdw.py jira update DATA-123 --status "In Progress" --comment "Starting work"
+python3 mdw.py jira list                          # list synced tickets
 ```
 
 ---
@@ -559,7 +559,7 @@ python3 vault/vault.py set graph '{
 python3 integrations/alerts.py --severity HIGH --title "NGR Test Alert"
 
 # Or via ngr CLI
-python3 ngr.py alert \
+python3 mdw.py alert \
   --title "Test: Pipeline health check" \
   --body "All systems nominal. This is a test." \
   --severity MEDIUM

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/setup.sh — First-time setup for Nishant_gastown_replica
+# scripts/setup.sh — First-time setup for Multi_Digital_Workers
 # Run: bash scripts/setup.sh
 
 set -euo pipefail
@@ -15,7 +15,7 @@ fail() { echo -e "${RED}  ✗${NC} $1"; exit 1; }
 step() { echo -e "\n${YELLOW}── $1${NC}"; }
 
 echo ""
-echo "  Nishant_gastown_replica — Setup"
+echo "  Multi_Digital_Workers — Setup"
 echo "  ================================"
 
 # ── Python version ────────────────────────────────────────────────────────
@@ -90,9 +90,9 @@ fi
 if [ -d "infrastructure/github_actions" ]; then
   cp infrastructure/github_actions/*.yml .github/workflows/ 2>/dev/null && \
     ok "GitHub Actions workflows copied to .github/workflows/" || \
-    warn "No workflows generated yet — run: python3 ngr.py infra generate --type github-actions"
+    warn "No workflows generated yet — run: python3 mdw.py infra generate --type github-actions"
 else
-  warn "infrastructure/github_actions not found — run: python3 ngr.py infra generate --all"
+  warn "infrastructure/github_actions not found — run: python3 mdw.py infra generate --all"
 fi
 
 # ── Connection test ───────────────────────────────────────────────────────
@@ -111,8 +111,8 @@ echo "  ║   Setup complete. Next steps:                ║"
 echo "  ╠══════════════════════════════════════════════╣"
 echo "  ║  1. Fill in .env with your credentials       ║"
 echo "  ║  2. python3 scripts/test_connections.py      ║"
-echo "  ║  3. python3 ngr.py status                    ║"
-echo "  ║  4. python3 ngr.py infra generate --all      ║"
+echo "  ║  3. python3 mdw.py status                    ║"
+echo "  ║  4. python3 mdw.py infra generate --all      ║"
 echo "  ║  5. See CONNECTIONS.md for full setup guide  ║"
 echo "  ╚══════════════════════════════════════════════╝"
 echo ""

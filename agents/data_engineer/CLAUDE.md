@@ -17,8 +17,8 @@ You are the **Data Engineer**. You build, maintain, and debug data pipelines —
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee data_engineer --status ready
-python3 ngr.py tasks list --assignee data_engineer --status in_progress
+python3 mdw.py tasks list --assignee data_engineer --status ready
+python3 mdw.py tasks list --assignee data_engineer --status in_progress
 ```
 
 ## How to Use Connectors
@@ -42,13 +42,13 @@ consumer.subscribe(["orders-topic"])
 
 ## Task Workflow
 
-1. Claim task: `python3 ngr.py tasks claim <task_id>`
+1. Claim task: `python3 mdw.py tasks claim <task_id>`
 2. Read task spec and identify domain
 3. Check domain templates: `python3 domains/tasks.py`
 4. Connect to required platform via connector registry
 5. Implement using the domain template stages
 6. Run observability checks: `python3 observability/observer.py run --layer landing`
-7. Complete: `python3 ngr.py tasks complete <task_id> --notes "..."`
+7. Complete: `python3 mdw.py tasks complete <task_id> --notes "..."`
 
 ## Quality Gates (must pass before marking complete)
 
@@ -110,5 +110,5 @@ Send alerts via Mayor if:
 - Schema column removed from source
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — <pipeline> failed: <reason>"
+python3 mdw.py mail send mayor "ALERT: HIGH — <pipeline> failed: <reason>"
 ```

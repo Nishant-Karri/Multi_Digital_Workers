@@ -43,11 +43,11 @@
       "id": "mayor",
       "name": "Mayor Workspace",
       "description": "This orchestrator repo",
-      "repo": "https://github.com/Nishant-Karri/Nishant_gastown_replica",
+      "repo": "https://github.com/Nishant-Karri/Multi_Digital_Workers",
       "tech_stack": ["Python", "AWS", "SQL", "Snowflake", "KQL", "Informatica", "Talend", "dbt"],
       "default_assignee": "mayor",
       "priority": "high",
-      "jira_projects": ["NGR", "PLATFORM"],
+      "jira_projects": ["MDW", "PLATFORM"],
       "pipelines": []
     }
   ],

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-integrations/ticket_processor.py — JIRA Ticket → NGR Task + instruction.md
+integrations/ticket_processor.py — JIRA Ticket → MDW Task + instruction.md
 
 Converts a JIRA ticket into:
-  1. An NGR task JSON (written to tasks/inbox/)
+  1. An MDW task JSON (written to tasks/inbox/)
   2. An instruction.md file (written to tasks/instructions/)
      — readable by any agent to understand exactly what to do
 
@@ -42,7 +42,7 @@ PRIORITY_MAP = {
     "lowest":    "low",
 }
 
-# Issue type mapping: JIRA → NGR type
+# Issue type mapping: JIRA → MDW type
 TYPE_MAP = {
     "bug":          "bug",
     "story":        "feature",
@@ -65,7 +65,7 @@ def _short_id() -> str:
 
 class TicketProcessor:
     """
-    Converts JIRA tickets to NGR tasks + instruction.md files.
+    Converts JIRA tickets to MDW tasks + instruction.md files.
     """
 
     def __init__(self):
@@ -106,16 +106,16 @@ class TicketProcessor:
 
     def process(self, ticket_key: str) -> str:
         """
-        Fetch a JIRA ticket by key, create NGR task + instruction.md.
-        Returns the NGR task_id.
+        Fetch a JIRA ticket by key, create MDW task + instruction.md.
+        Returns the MDW task_id.
         """
         ticket = self._jira_client().get_ticket(ticket_key)
         return self.process_dict(ticket)
 
     def process_dict(self, ticket: dict) -> str:
         """
-        Convert an already-fetched ticket dict → NGR task + instruction.md.
-        Returns the NGR task_id.
+        Convert an already-fetched ticket dict → MDW task + instruction.md.
+        Returns the MDW task_id.
         """
         self._load_domain()
         self._load_routing()
@@ -140,7 +140,7 @@ class TicketProcessor:
         # Auto-size task
         size        = self._size_task(ticket)
 
-        # Build NGR task
+        # Build MDW task
         task_id = f"JIRA-{ticket['key']}"
         task = {
             "id":            task_id,
@@ -293,28 +293,28 @@ class TicketProcessor:
 - [ ] All quality gates pass
 - [ ] Code/changes reviewed (if required)
 - [ ] JIRA ticket transitioned to **Done**
-- [ ] NGR task marked complete: `python3 ngr.py tasks complete {task['id']} --notes "..."`
+- [ ] MDW task marked complete: `python3 mdw.py tasks complete {task['id']} --notes "..."`
 - [ ] JIRA comment added with summary of work done
 
 ## Agent Commands
 
 ```bash
 # Claim this task
-python3 ngr.py tasks claim {task['id']} --agent {task['agent_role']}
+python3 mdw.py tasks claim {task['id']} --agent {task['agent_role']}
 
 # View full task
-python3 ngr.py tasks show {task['id']}
+python3 mdw.py tasks show {task['id']}
 
 # Mark complete
-python3 ngr.py tasks complete {task['id']} --notes "Completed: <what you did>"
+python3 mdw.py tasks complete {task['id']} --notes "Completed: <what you did>"
 
 # Update JIRA status
-python3 ngr.py jira update {task['jira_key']} --status "In Progress"
-python3 ngr.py jira update {task['jira_key']} --status "Done" --comment "Completed by NGR agent."
+python3 mdw.py jira update {task['jira_key']} --status "In Progress"
+python3 mdw.py jira update {task['jira_key']} --status "Done" --comment "Completed by MDW agent."
 
 # Escalate if blocked
-python3 ngr.py tasks block {task['id']} --reason "<reason>"
-python3 ngr.py jira update {task['jira_key']} --status "Blocked"
+python3 mdw.py tasks block {task['id']} --reason "<reason>"
+python3 mdw.py jira update {task['jira_key']} --status "Blocked"
 ```
 """
 
@@ -339,7 +339,7 @@ python3 ngr.py jira update {task['jira_key']} --status "Blocked"
         return "small"
 
     def _infer_project(self, ticket: dict) -> str:
-        """Map JIRA project key → NGR project id."""
+        """Map JIRA project key → MDW project id."""
         config_file = ROOT / "config" / "projects.json"
         if config_file.exists():
             cfg = json.loads(config_file.read_text())

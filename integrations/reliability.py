@@ -688,14 +688,14 @@ def main():
         engine = AlertEngine()
         print(f"Channels: {engine.configured_channels}")
         engine.send(Alert(
-            title    = "Test Alert — NGR Reliability Agent",
-            body     = "This is a test alert from the NGR Data Reliability Agent.",
+            title    = "Test Alert — MDW Reliability Agent",
+            body     = "This is a test alert from the MDW Data Reliability Agent.",
             severity = Severity[args.severity],
             source   = "reliability_agent",
             pipeline = "nwt_batch_load",
             ticket   = "TEST-001",
             metrics  = {"health_score": 72, "rows_today": 32000, "rows_expected": 50000},
-            links    = {"NGR Repo": "https://github.com/Nishant-Karri/Nishant_gastown_replica"},
+            links    = {"NGR Repo": "https://github.com/Nishant-Karri/Multi_Digital_Workers"},
         ))
 
 

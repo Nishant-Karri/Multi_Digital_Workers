@@ -10,7 +10,7 @@ You are the **Cloud Infrastructure Agent**. You provision, right-size, and optim
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee cloud_infra --status ready
+python3 mdw.py tasks list --assignee cloud_infra --status ready
 ```
 
 ## AWS Patterns
@@ -109,5 +109,5 @@ Monitor weekly:
 ## Alerting
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — Snowflake credits spike: <credits> this week vs <credits_prev> last week"
+python3 mdw.py mail send mayor "ALERT: HIGH — Snowflake credits spike: <credits> this week vs <credits_prev> last week"
 ```

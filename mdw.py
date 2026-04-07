@@ -1,51 +1,51 @@
 #!/usr/bin/env python3
 """
-ngr.py — Nishant_gastown_replica CLI
+mdw.py — Multi_Digital_Workers CLI
 Multi-agent orchestrator using Claude Teams, no external dependencies.
 
 Usage:
-  python3 ngr.py status
-  python3 ngr.py tasks list [--status open|active|blocked|completed] [--project <id>]
-  python3 ngr.py tasks create --title "..." --project <id> [--priority high|medium|low] [--type task|bug|feature|review]
-  python3 ngr.py tasks show <task_id>
-  python3 ngr.py tasks claim <task_id> [--agent <agent_id>]
-  python3 ngr.py tasks complete <task_id> [--notes "..."]
-  python3 ngr.py tasks block <task_id> --reason "..."
-  python3 ngr.py tasks ready
-  python3 ngr.py mail send <to> <message>
-  python3 ngr.py mail inbox [--agent <agent_id>]
-  python3 ngr.py mail read <mail_id>
-  python3 ngr.py review list
-  python3 ngr.py review approve <task_id> [--notes "..."]
-  python3 ngr.py review reject <task_id> --notes "..."
-  python3 ngr.py history [--limit 20] [--status failed]
-  python3 ngr.py spawn <agent_role> --task <task_id>
+  python3 mdw.py status
+  python3 mdw.py tasks list [--status open|active|blocked|completed] [--project <id>]
+  python3 mdw.py tasks create --title "..." --project <id> [--priority high|medium|low] [--type task|bug|feature|review]
+  python3 mdw.py tasks show <task_id>
+  python3 mdw.py tasks claim <task_id> [--agent <agent_id>]
+  python3 mdw.py tasks complete <task_id> [--notes "..."]
+  python3 mdw.py tasks block <task_id> --reason "..."
+  python3 mdw.py tasks ready
+  python3 mdw.py mail send <to> <message>
+  python3 mdw.py mail inbox [--agent <agent_id>]
+  python3 mdw.py mail read <mail_id>
+  python3 mdw.py review list
+  python3 mdw.py review approve <task_id> [--notes "..."]
+  python3 mdw.py review reject <task_id> --notes "..."
+  python3 mdw.py history [--limit 20] [--status failed]
+  python3 mdw.py spawn <agent_role> --task <task_id>
 
-  python3 ngr.py jira sync --project DATA [--status "To Do"] [--max 50]
-  python3 ngr.py jira fetch DATA-123
-  python3 ngr.py jira execute DATA-123
-  python3 ngr.py jira update DATA-123 --status "In Progress" [--comment "..."]
-  python3 ngr.py jira comment DATA-123 --text "Work started."
-  python3 ngr.py jira list
+  python3 mdw.py jira sync --project DATA [--status "To Do"] [--max 50]
+  python3 mdw.py jira fetch DATA-123
+  python3 mdw.py jira execute DATA-123
+  python3 mdw.py jira update DATA-123 --status "In Progress" [--comment "..."]
+  python3 mdw.py jira comment DATA-123 --text "Work started."
+  python3 mdw.py jira list
 
-  python3 ngr.py investigate --pipeline nwt_batch_load
-  python3 ngr.py investigate list [--status PENDING_REVIEW]
-  python3 ngr.py investigate approve INV-ABC123 [--notes "..."]
-  python3 ngr.py investigate reject  INV-ABC123 --notes "..."
-  python3 ngr.py investigate apply   INV-ABC123
+  python3 mdw.py investigate --pipeline nwt_batch_load
+  python3 mdw.py investigate list [--status PENDING_REVIEW]
+  python3 mdw.py investigate approve INV-ABC123 [--notes "..."]
+  python3 mdw.py investigate reject  INV-ABC123 --notes "..."
+  python3 mdw.py investigate apply   INV-ABC123
 
-  python3 ngr.py qa generate --pipeline dbt_star_schema
-  python3 ngr.py qa run      --pipeline dbt_star_schema
-  python3 ngr.py qa lineage  --pipeline dbt_star_schema
-  python3 ngr.py qa publish  --run-id QA-ABC123
-  python3 ngr.py qa full     --pipeline dbt_star_schema
+  python3 mdw.py qa generate --pipeline dbt_star_schema
+  python3 mdw.py qa run      --pipeline dbt_star_schema
+  python3 mdw.py qa lineage  --pipeline dbt_star_schema
+  python3 mdw.py qa publish  --run-id QA-ABC123
+  python3 mdw.py qa full     --pipeline dbt_star_schema
 
-  python3 ngr.py infra generate [--type all|github-actions|terraform]
-  python3 ngr.py infra plan  --env dev
-  python3 ngr.py infra apply --env dev
-  python3 ngr.py infra push  --env prod
+  python3 mdw.py infra generate [--type all|github-actions|terraform]
+  python3 mdw.py infra plan  --env dev
+  python3 mdw.py infra apply --env dev
+  python3 mdw.py infra push  --env prod
 
-  python3 ngr.py alert --title "..." --body "..." [--severity HIGH] [--pipeline <name>]
+  python3 mdw.py alert --title "..." --body "..." [--severity HIGH] [--pipeline <name>]
 """
 
 import argparse
@@ -113,7 +113,7 @@ def cmd_status(args):
             blocked.append(t)
 
     print("=" * 50)
-    print("  Nishant_gastown_replica — Status")
+    print("  Multi_Digital_Workers — Status")
     print("=" * 50)
     print(f"  Inbox (new tasks): {len(inbox)}")
     print(f"  Active tasks:      {len(active)}")
@@ -267,7 +267,7 @@ def cmd_tasks(args):
         t["updated_at"]   = now_iso()
         save_json(f, t)
         print(f"⚠  Task {task_id} blocked: {reason}")
-        print(f"   Run: python3 ngr.py mail send mayor 'BLOCKED on {task_id}: {reason}'")
+        print(f"   Run: python3 mdw.py mail send mayor 'BLOCKED on {task_id}: {reason}'")
 
     elif sub == "ready":
         tasks = load_all(TASKS_INBOX)
@@ -412,7 +412,7 @@ def cmd_jira(args):
     sub = args.jira_cmd
 
     if sub == "sync":
-        # Fetch open tickets from JIRA and create NGR tasks + instruction.md
+        # Fetch open tickets from JIRA and create MDW tasks + instruction.md
         from integrations.jira import JiraClient
         from integrations.ticket_processor import TicketProcessor
         client = JiraClient()
@@ -431,7 +431,7 @@ def cmd_jira(args):
 
         print(f"\n  Syncing {len(tickets)} tickets from {project}...\n")
         task_ids = proc.process_bulk(tickets)
-        print(f"\n  ✓ Synced {len(task_ids)} tasks. Run: python3 ngr.py tasks ready")
+        print(f"\n  ✓ Synced {len(task_ids)} tasks. Run: python3 mdw.py tasks ready")
 
     elif sub == "fetch":
         # Fetch and display a single JIRA ticket
@@ -467,12 +467,12 @@ def cmd_jira(args):
             print(f"  Agent:   {agent_role}")
             print(f"  Instructions: {instr_path}")
             print(f"\n  To execute, spawn the {agent_role} agent:")
-            print(f"  python3 ngr.py spawn {agent_role} --task {task_id}")
+            print(f"  python3 mdw.py spawn {agent_role} --task {task_id}")
 
             # Transition JIRA ticket to In Progress
             try:
                 client.transition(args.ticket_key, "In Progress")
-                client.comment(args.ticket_key, f"Picked up by NGR agent. Task ID: {task_id}")
+                client.comment(args.ticket_key, f"Picked up by MDW agent. Task ID: {task_id}")
                 print(f"  ✓ JIRA {args.ticket_key} → In Progress")
             except Exception as e:
                 print(f"  [JIRA] Could not transition: {e}")
@@ -500,7 +500,7 @@ def cmd_jira(args):
                 t = load_json(f)
                 all_tasks.append(t)
         if not all_tasks:
-            print("No JIRA tasks synced. Run: python3 ngr.py jira sync --project <KEY>")
+            print("No JIRA tasks synced. Run: python3 mdw.py jira sync --project <KEY>")
             return
         print(f"\n  {'NGR ID':18s} {'JIRA':12s} {'STATUS':10s} {'PRIORITY':8s} {'TITLE'}")
         print("  " + "-" * 80)
@@ -641,15 +641,15 @@ To spawn a {role} agent, use the Agent tool in Claude Code:
 
 Agent(
     subagent_type="general-purpose",
-    prompt=\"\"\"You are a {role.capitalize()} agent in Nishant_gastown_replica.
+    prompt=\"\"\"You are a {role.capitalize()} agent in Multi_Digital_Workers.
 
 Working directory: {ROOT}
 
 Your role: {agent['description']}
 
 1. Read your role file: {claude_md}
-2. Run: python3 ngr.py status
-{f"3. Your assigned task: python3 ngr.py tasks show {task_id}" if task_id else "3. Run: python3 ngr.py tasks ready"}
+2. Run: python3 mdw.py status
+{f"3. Your assigned task: python3 mdw.py tasks show {task_id}" if task_id else "3. Run: python3 mdw.py tasks ready"}
 4. Execute your responsibilities.
 \"\"\",
     run_in_background={"True" if role == "monitor" else "False"}
@@ -660,7 +660,7 @@ Your role: {agent['description']}
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(prog="ngr", description="Nishant_gastown_replica CLI")
+    parser = argparse.ArgumentParser(prog="ngr", description="Multi_Digital_Workers CLI")
     sub = parser.add_subparsers(dest="cmd")
 
     # status
@@ -761,7 +761,7 @@ def main():
     inv_run.add_argument("--database", default="NISHANT_DS_DB")
     inv_run.add_argument("--schema",   default="NISHANT_WORKFLOW_TEST")
     inv_run.add_argument("--no-alert", action="store_true")
-    invp.add_argument("--pipeline", nargs="?")  # direct: ngr.py investigate --pipeline X
+    invp.add_argument("--pipeline", nargs="?")  # direct: mdw.py investigate --pipeline X
     invp.add_argument("--database", default="NISHANT_DS_DB")
     invp.add_argument("--schema",   default="NISHANT_WORKFLOW_TEST")
     invp.add_argument("--no-alert", action="store_true")

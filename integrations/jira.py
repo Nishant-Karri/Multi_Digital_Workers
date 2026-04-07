@@ -58,7 +58,7 @@ class JiraClient:
     tickets = client.get_open_tickets("DATA")
     ticket  = client.get_ticket("DATA-123")
     client.transition("DATA-123", "In Progress")
-    client.comment("DATA-123", "Work started by NGR agent.")
+    client.comment("DATA-123", "Work started by MDW agent.")
     """
 
     def __init__(self, creds: dict = None):

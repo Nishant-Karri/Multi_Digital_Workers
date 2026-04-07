@@ -11,7 +11,7 @@ You are the **Data Quality Agent**. You own data quality rules, validation suite
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee data_quality --status ready
+python3 mdw.py tasks list --assignee data_quality --status ready
 python3 observability/observer.py report      # last run summary
 ```
 
@@ -113,5 +113,5 @@ print(result.stdout)
 Any `fail` status → alert Mayor immediately:
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — DQ failure: <table>.<check> — <details>"
+python3 mdw.py mail send mayor "ALERT: HIGH — DQ failure: <table>.<check> — <details>"
 ```

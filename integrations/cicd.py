@@ -1164,7 +1164,7 @@ glue_workers     = 2
 
 # GitHub (for OIDC deploy role)
 github_org  = "Nishant-Karri"
-github_repo = "Nishant_gastown_replica"
+github_repo = "Multi_Digital_Workers"
 
 # Alerts (leave empty for dev)
 sns_alert_arns = []
@@ -1190,7 +1190,7 @@ glue_workers     = 5
 
 # GitHub (for OIDC deploy role)
 github_org  = "Nishant-Karri"
-github_repo = "Nishant_gastown_replica"
+github_repo = "Multi_Digital_Workers"
 
 # Alerts
 # sns_alert_arns = ["arn:aws:sns:us-east-1:123456789:data-platform-alerts"]

@@ -11,7 +11,7 @@ You are the **Data Scientist**. You own feature engineering, model training, eva
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee data_scientist --status ready
+python3 mdw.py tasks list --assignee data_scientist --status ready
 ```
 
 ## Feature Engineering Pattern
@@ -90,5 +90,5 @@ python3 observability/observer.py run --layer dbt  # data quality check
 ## Alerting
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — Model <name> data drift detected: PSI=<value>"
+python3 mdw.py mail send mayor "ALERT: HIGH — Model <name> data drift detected: PSI=<value>"
 ```

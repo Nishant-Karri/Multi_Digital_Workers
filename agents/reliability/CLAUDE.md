@@ -19,7 +19,7 @@ Every data pipeline must meet these 7 reliability principles:
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee reliability --status ready
+python3 mdw.py tasks list --assignee reliability --status ready
 python3 integrations/reliability.py monitor               # full pipeline check
 python3 integrations/reliability.py incident list         # active incidents
 python3 integrations/reliability.py slo --days 7          # weekly SLO report
@@ -163,7 +163,7 @@ Every 30 minutes (or on-demand):
 
 Weekly (Monday):
 1. `python3 integrations/reliability.py slo --days 7`
-2. Send SLO report to mayor: `python3 ngr.py mail send mayor "SLO Report: ..."`
+2. Send SLO report to mayor: `python3 mdw.py mail send mayor "SLO Report: ..."`
 
 ## Output Files
 

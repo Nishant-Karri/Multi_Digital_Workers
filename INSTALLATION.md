@@ -1,4 +1,4 @@
-# Installation Guide — Nishant_gastown_replica on Windows EC2
+# Installation Guide — Multi_Digital_Workers on Windows EC2
 
 This document records every step taken to provision a Windows EC2 instance
 and install Claude Code + the orchestrator from scratch using AWS SSM (no RDP required).
@@ -141,7 +141,7 @@ Start-Process -Wait "$env:TEMP\git-installer.exe" `
 
 ### Step 3 — Install Python 3.11
 
-**Why:** The orchestrator (`ngr.py`, all integrations) requires Python 3.11+.
+**Why:** The orchestrator (`mdw.py`, all integrations) requires Python 3.11+.
 
 ```powershell
 $url = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
@@ -173,7 +173,7 @@ claude --version
 
 ### Step 5 — Clone the Orchestrator + Setup
 
-**Why:** Pulls the full `Nishant_gastown_replica` repo, creates a Python virtual
+**Why:** Pulls the full `Multi_Digital_Workers` repo, creates a Python virtual
 environment, installs core dependencies, and copies the `.env` template.
 
 ```powershell
@@ -183,8 +183,8 @@ $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";"
 Set-Location C:\Users\Administrator
 
 # Clone repo
-git clone https://github.com/Nishant-Karri/Nishant_gastown_replica.git
-Set-Location Nishant_gastown_replica
+git clone https://github.com/Nishant-Karri/Multi_Digital_Workers.git
+Set-Location Multi_Digital_Workers
 
 # Create isolated Python environment
 python -m venv .venv
@@ -197,13 +197,13 @@ python -m venv .venv
 Copy-Item vault\env.template .env
 
 # Smoke test
-.venv\Scripts\python ngr.py status
+.venv\Scripts\python mdw.py status
 ```
 
 **Result:**
 ```
 ==================================================
-  Nishant_gastown_replica — Status
+  Multi_Digital_Workers — Status
 ==================================================
   Inbox (new tasks): 0
   Active tasks:      0
@@ -241,7 +241,7 @@ Open PowerShell as Administrator:
 ### 3.3 Fill in credentials
 
 ```powershell
-Set-Location C:\Users\Administrator\Nishant_gastown_replica
+Set-Location C:\Users\Administrator\Multi_Digital_Workers
 notepad .env
 ```
 
@@ -275,7 +275,7 @@ TEAMS_WEBHOOK=https://yourcompany.webhook.office.com/...
 ### 3.6 Start Claude Code
 
 ```powershell
-Set-Location C:\Users\Administrator\Nishant_gastown_replica
+Set-Location C:\Users\Administrator\Multi_Digital_Workers
 claude
 ```
 
@@ -291,8 +291,8 @@ claude
 | Git | 2.47.0 | `C:\Program Files\Git\` |
 | Python | 3.11.9 | `C:\Program Files\Python311\` |
 | Claude Code | 2.1.92 | npm global bin |
-| Repo | latest main | `C:\Users\Administrator\Nishant_gastown_replica\` |
-| Python venv | — | `C:\Users\Administrator\Nishant_gastown_replica\.venv\` |
+| Repo | latest main | `C:\Users\Administrator\Multi_Digital_Workers\` |
+| Python venv | — | `C:\Users\Administrator\Multi_Digital_Workers\.venv\` |
 
 ---
 
@@ -300,7 +300,7 @@ claude
 
 ```powershell
 # Navigate to repo
-Set-Location C:\Users\Administrator\Nishant_gastown_replica
+Set-Location C:\Users\Administrator\Multi_Digital_Workers
 
 # Activate Python environment
 .venv\Scripts\Activate.ps1
@@ -308,10 +308,10 @@ Set-Location C:\Users\Administrator\Nishant_gastown_replica
 # Start Claude Code
 claude
 
-# Common NGR commands
-python ngr.py status
-python ngr.py jira sync
-python ngr.py qa run --pipeline nwt_batch_load
+# Common MDW commands
+python mdw.py status
+python mdw.py jira sync
+python mdw.py qa run --pipeline nwt_batch_load
 python integrations\reliability.py monitor
 python scripts\test_connections.py
 ```

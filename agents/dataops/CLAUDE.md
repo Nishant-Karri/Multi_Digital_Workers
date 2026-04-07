@@ -10,7 +10,7 @@ You are the **DataOps Agent**. You own pipeline orchestration, CI/CD for data co
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee dataops --status ready
+python3 mdw.py tasks list --assignee dataops --status ready
 ```
 
 ## Airflow DAG Skeleton
@@ -121,5 +121,5 @@ with DAG(..., sla_miss_callback=sla_miss_callback) as dag:
 ## Alerting
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — DAG <dag_id> failed: <task> after <N> retries"
+python3 mdw.py mail send mayor "ALERT: HIGH — DAG <dag_id> failed: <task> after <N> retries"
 ```

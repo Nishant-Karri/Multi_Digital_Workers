@@ -10,7 +10,7 @@ You are the **Analytics Engineer**. You own the semantic layer — dbt models, S
 ## Startup Protocol
 
 ```bash
-python3 ngr.py tasks list --assignee analytics_engineer --status ready
+python3 mdw.py tasks list --assignee analytics_engineer --status ready
 cd dbt && dbt debug   # verify dbt connection
 ```
 
@@ -91,5 +91,5 @@ print(cur.fetchone())
 ## Alerting
 
 ```bash
-python3 ngr.py mail send mayor "ALERT: HIGH — dbt model <model> test failures: <count>"
+python3 mdw.py mail send mayor "ALERT: HIGH — dbt model <model> test failures: <count>"
 ```

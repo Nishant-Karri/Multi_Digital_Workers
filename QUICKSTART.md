@@ -1,4 +1,4 @@
-# Nishant_gastown_replica — Org Quickstart
+# Multi_Digital_Workers — Org Quickstart
 
 Ten steps to go from zero to a fully operational data orchestration platform.
 
@@ -19,8 +19,8 @@ Ten steps to go from zero to a fully operational data orchestration platform.
 ## Step 1 — Clone and run setup
 
 ```bash
-git clone https://github.com/Nishant-Karri/Nishant_gastown_replica.git
-cd Nishant_gastown_replica
+git clone https://github.com/Nishant-Karri/Multi_Digital_Workers.git
+cd Multi_Digital_Workers
 bash scripts/setup.sh
 ```
 
@@ -122,13 +122,13 @@ Edit `config/projects.json` and add your JIRA project keys to each project's `ji
 
 ```bash
 # Generate all GitHub Actions workflows + Terraform modules
-python3 ngr.py infra generate --all
+python3 mdw.py infra generate --all
 
 # Review the generated Terraform plan before applying
-python3 ngr.py infra plan --env dev
+python3 mdw.py infra plan --env dev
 
 # Apply dev environment (requires confirmation)
-python3 ngr.py infra apply --env dev
+python3 mdw.py infra apply --env dev
 ```
 
 > **Terraform state bucket** — create this once before first `plan`:
@@ -165,13 +165,13 @@ In your repo: **Settings → Secrets and variables → Actions**
 
 ```bash
 # Fetch all open tickets across configured projects and create tasks
-python3 ngr.py jira sync
+python3 mdw.py jira sync
 
 # Check what was created
-python3 ngr.py tasks list --status ready
+python3 mdw.py tasks list --status ready
 
 # Execute a specific ticket
-python3 ngr.py jira execute JIRA-123
+python3 mdw.py jira execute JIRA-123
 ```
 
 ---
@@ -180,16 +180,16 @@ python3 ngr.py jira execute JIRA-123
 
 ```bash
 # Generate test plan + test cases + sample data
-python3 ngr.py qa generate --pipeline nwt_batch_load
+python3 mdw.py qa generate --pipeline nwt_batch_load
 
 # Run all test cases (connects to Snowflake)
-python3 ngr.py qa run --pipeline nwt_batch_load
+python3 mdw.py qa run --pipeline nwt_batch_load
 
 # Generate lineage document
-python3 ngr.py qa lineage --pipeline nwt_batch_load
+python3 mdw.py qa lineage --pipeline nwt_batch_load
 
 # Publish all artifacts with git tag
-python3 ngr.py qa publish --run-id QA-$(date +%Y%m%d)
+python3 mdw.py qa publish --run-id QA-$(date +%Y%m%d)
 ```
 
 ---
@@ -198,7 +198,7 @@ python3 ngr.py qa publish --run-id QA-$(date +%Y%m%d)
 
 ```bash
 # Check overall status
-python3 ngr.py status
+python3 mdw.py status
 
 # Run observability check
 python3 observability/observer.py run
@@ -207,14 +207,14 @@ python3 observability/observer.py run
 python3 integrations/reliability.py monitor
 
 # Investigate a specific pipeline
-python3 ngr.py investigate run --pipeline nwt_batch_load
+python3 mdw.py investigate run --pipeline nwt_batch_load
 
 # Review and approve fixes
-python3 ngr.py investigate list
-python3 ngr.py investigate approve INV-XXXXXX
+python3 mdw.py investigate list
+python3 mdw.py investigate approve INV-XXXXXX
 
 # Apply approved fixes to Snowflake + push to git
-python3 ngr.py investigate apply INV-XXXXXX --push
+python3 mdw.py investigate apply INV-XXXXXX --push
 ```
 
 ---
@@ -242,16 +242,16 @@ python3 ngr.py investigate apply INV-XXXXXX --push
 
 ```bash
 # Morning check — run every day
-python3 ngr.py status
+python3 mdw.py status
 python3 integrations/reliability.py monitor
-python3 ngr.py jira sync
+python3 mdw.py jira sync
 
 # After every pipeline run
-python3 ngr.py qa run --pipeline <name>
+python3 mdw.py qa run --pipeline <name>
 
 # Weekly (Monday)
-python3 ngr.py qa full --pipeline nwt_batch_load
-python3 ngr.py qa full --pipeline dbt_star_schema
+python3 mdw.py qa full --pipeline nwt_batch_load
+python3 mdw.py qa full --pipeline dbt_star_schema
 ```
 
 ---
@@ -262,8 +262,8 @@ python3 ngr.py qa full --pipeline dbt_star_schema
 |---------|---------|
 | Connection fails | `python3 scripts/test_connections.py` |
 | Vault missing key | `python3 vault/vault.py list` |
-| Task stuck | `python3 ngr.py tasks list --status active` |
-| Investigation pending | `python3 ngr.py investigate list` |
+| Task stuck | `python3 mdw.py tasks list --status active` |
+| Investigation pending | `python3 mdw.py investigate list` |
 | Alert not sending | Check `.env` webhook URLs |
 | Terraform state error | Verify `backend.hcl` bucket exists |
 
