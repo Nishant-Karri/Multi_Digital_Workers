@@ -28,7 +28,7 @@ def load_manifest() -> dict:
         return json.load(f)
 
 
-def invoke_agent(region: str, alias_arn: str, prompt: str, session_id: str | None):
+def invoke_agent(region: str, alias_arn: str, prompt: str, session_id):
     # Parse agent_id and alias_id from arn
     # Format: arn:aws:bedrock:<region>:<account>:agent-alias/<agentId>/<aliasId>
     parts    = alias_arn.split("/")

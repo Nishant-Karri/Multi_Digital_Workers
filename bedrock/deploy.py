@@ -2,7 +2,7 @@
 Deploy all 16 Multi Digital Worker agents to AWS Bedrock Agent Core.
 
 Architecture:
-  Mayor (SUPERVISOR_AND_EXECUTOR) orchestrates 15 specialist sub-agents.
+  Mayor (SUPERVISOR) orchestrates 15 specialist sub-agents.
   Each sub-agent is registered as a Bedrock Agent with its CLAUDE.md as the instruction.
   Mayor uses multi-agent collaboration to route tasks based on domain/type.
 
@@ -39,22 +39,10 @@ AGENT_POLICY = json.dumps({
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "BedrockFoundationModelAccess",
+            "Sid": "BedrockFullAccess",
             "Effect": "Allow",
-            "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
-            "Resource": "arn:aws:bedrock:*::foundation-model/*"
-        },
-        {
-            "Sid": "BedrockAgentInvoke",
-            "Effect": "Allow",
-            "Action": ["bedrock:InvokeAgent"],
-            "Resource": "arn:aws:bedrock:*:*:agent-alias/*"
-        },
-        {
-            "Sid": "CrossRegionInference",
-            "Effect": "Allow",
-            "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
-            "Resource": "arn:aws:bedrock:*:*:inference-profile/*"
+            "Action": ["bedrock:*"],
+            "Resource": "*"
         }
     ]
 })
@@ -93,7 +81,9 @@ def ensure_iam_role(iam, account_id: str, dry_run: bool) -> str:
         return role_arn
     try:
         role = iam.get_role(RoleName=ROLE_NAME)["Role"]
-        log(f"IAM role already exists: {role['Arn']}")
+        log(f"IAM role already exists: {role['Arn']} — refreshing policy")
+        iam.put_role_policy(RoleName=ROLE_NAME, PolicyName=POLICY_NAME, PolicyDocument=AGENT_POLICY)
+        time.sleep(5)
         return role["Arn"]
     except iam.exceptions.NoSuchEntityException:
         pass
@@ -143,7 +133,7 @@ def get_or_create_agent(client, cfg: dict, role_arn: str, dry_run: bool) -> dict
                     foundationModel=FOUNDATION_MODEL,
                     description=description,
                     instruction=instruction,
-                    **({"agentCollaboration": "SUPERVISOR_AND_EXECUTOR"} if is_supervisor else {}),
+                    **({"agentCollaboration": "SUPERVISOR"} if is_supervisor else {}),
                 )
                 wait_agent_ready(client, a["agentId"])
                 return {"agent_id": a["agentId"], "agent_name": name, "agent_arn": a.get("agentArn", "")}
@@ -159,7 +149,7 @@ def get_or_create_agent(client, cfg: dict, role_arn: str, dry_run: bool) -> dict
         tags={"project": "multi-digital-workers", "role": cfg["role"]},
     )
     if is_supervisor:
-        kwargs["agentCollaboration"] = "SUPERVISOR_AND_EXECUTOR"
+        kwargs["agentCollaboration"] = "SUPERVISOR"
 
     resp     = client.create_agent(**kwargs)
     agent    = resp["agent"]
@@ -187,16 +177,18 @@ def ensure_alias(client, agent_id: str, agent_name: str, dry_run: bool) -> str:
     existing = client.list_agent_aliases(agentId=agent_id).get("agentAliasSummaries", [])
     for a in existing:
         if a["agentAliasName"] == alias_name:
-            log(f"  Alias 'live' already exists for {agent_name}: {a['agentAliasArn']}")
-            return a["agentAliasArn"]
+            alias_arn = f"arn:aws:bedrock:{client.meta.region_name}:{boto3.client('sts').get_caller_identity()['Account']}:agent-alias/{agent_id}/{a['agentAliasId']}"
+            log(f"  Alias 'live' already exists for {agent_name}: {alias_arn}")
+            return alias_arn
 
-    resp = client.create_agent_alias(
+    resp      = client.create_agent_alias(
         agentId=agent_id,
         agentAliasName=alias_name,
         description=f"Live alias for {agent_name}",
         tags={"project": "multi-digital-workers"},
     )
-    alias_arn = resp["agentAlias"]["agentAliasArn"]
+    alias_id  = resp["agentAlias"]["agentAliasId"]
+    alias_arn = f"arn:aws:bedrock:{client.meta.region_name}:{boto3.client('sts').get_caller_identity()['Account']}:agent-alias/{agent_id}/{alias_id}"
     log(f"  Created alias 'live' for {agent_name}: {alias_arn}")
     return alias_arn
 
@@ -210,7 +202,7 @@ def associate_collaborators(client, mayor_id: str, sub_agents: list, dry_run: bo
 
     existing = {
         c["agentDescriptor"]["aliasArn"]: c
-        for c in client.list_agent_collaborators(agentId=mayor_id).get("agentCollaboratorSummaries", [])
+        for c in client.list_agent_collaborators(agentId=mayor_id, agentVersion="DRAFT").get("agentCollaboratorSummaries", [])
     }
 
     for sa in sub_agents:
@@ -220,8 +212,9 @@ def associate_collaborators(client, mayor_id: str, sub_agents: list, dry_run: bo
             continue
         client.associate_agent_collaborator(
             agentId=mayor_id,
+            agentVersion="DRAFT",
             agentDescriptor={"aliasArn": alias_arn},
-            collaboratorName=sa["agent_name"].replace("mdw-", ""),
+            collaboratorName=sa["agent_name"].replace("mdw-", "").replace("-", "_"),
             collaborationInstruction=sa["description"],
             relayConversationHistory="TO_COLLABORATOR",
         )
@@ -236,17 +229,20 @@ def prepare_mayor(client, mayor_id: str, dry_run: bool) -> str:
     log("Preparing Mayor agent (final step)…", "STEP")
     client.prepare_agent(agentId=mayor_id)
     wait_agent_ready(client, mayor_id, timeout=180)
-    existing = client.list_agent_aliases(agentId=mayor_id).get("agentAliasSummaries", [])
+    account   = boto3.client("sts").get_caller_identity()["Account"]
+    region    = client.meta.region_name
+    existing  = client.list_agent_aliases(agentId=mayor_id).get("agentAliasSummaries", [])
     for a in existing:
         if a["agentAliasName"] == "live":
-            return a["agentAliasArn"]
-    resp = client.create_agent_alias(
+            return f"arn:aws:bedrock:{region}:{account}:agent-alias/{mayor_id}/{a['agentAliasId']}"
+    resp     = client.create_agent_alias(
         agentId=mayor_id,
         agentAliasName="live",
         description="Live alias for Mayor orchestrator",
         tags={"project": "multi-digital-workers"},
     )
-    return resp["agentAlias"]["agentAliasArn"]
+    alias_id = resp["agentAlias"]["agentAliasId"]
+    return f"arn:aws:bedrock:{region}:{account}:agent-alias/{mayor_id}/{alias_id}"
 
 
 def save_manifest(manifest: dict, region: str):
@@ -258,7 +254,7 @@ def save_manifest(manifest: dict, region: str):
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-def deploy(region: str, dry_run: bool, target_agent: str | None):
+def deploy(region: str, dry_run: bool, target_agent):
     print(f"\n{'='*60}")
     print(f"  Multi Digital Workers — Bedrock Agent Core Deployment")
     print(f"  Region: {region}  |  Dry-run: {dry_run}")

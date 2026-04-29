@@ -1,0 +1,88 @@
+{
+  "region": "us-east-1",
+  "account_id": "717728193460",
+  "model": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  "mayor": {
+    "agent_id": "OPPR3GMFLD",
+    "agent_name": "mdw-mayor",
+    "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/OPPR3GMFLD/TSTALIASID",
+    "entrypoint": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/OPPR3GMFLD/TSTALIASID"
+  },
+  "sub_agents": {
+    "mdw-analytics-engineer": {
+      "agent_id": "F6YJCBPZBF",
+      "agent_name": "mdw-analytics-engineer",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/F6YJCBPZBF/PPXU15PIMT"
+    },
+    "mdw-cicd": {
+      "agent_id": "CMSER5IKKZ",
+      "agent_name": "mdw-cicd",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/CMSER5IKKZ/FPALCBYROU"
+    },
+    "mdw-cloud-infra": {
+      "agent_id": "UIXL7GVUQC",
+      "agent_name": "mdw-cloud-infra",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/UIXL7GVUQC/YT2FO7IHWQ"
+    },
+    "mdw-data-engineer": {
+      "agent_id": "TCHB2ALEPI",
+      "agent_name": "mdw-data-engineer",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/TCHB2ALEPI/DDYFJOPP4B"
+    },
+    "mdw-data-quality": {
+      "agent_id": "5SEI2JNKSM",
+      "agent_name": "mdw-data-quality",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/5SEI2JNKSM/UZIMVA1M8L"
+    },
+    "mdw-data-scientist": {
+      "agent_id": "JAZ4MYPROQ",
+      "agent_name": "mdw-data-scientist",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/JAZ4MYPROQ/4ASYUZFHPH"
+    },
+    "mdw-dataops": {
+      "agent_id": "YYA3J6MUAJ",
+      "agent_name": "mdw-dataops",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/YYA3J6MUAJ/U8OE2WNF93"
+    },
+    "mdw-governance": {
+      "agent_id": "RPS7GOZYCD",
+      "agent_name": "mdw-governance",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/RPS7GOZYCD/HATUBLUFHD"
+    },
+    "mdw-investigator": {
+      "agent_id": "QMYHXWSMOU",
+      "agent_name": "mdw-investigator",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/QMYHXWSMOU/SNNVFHQXZN"
+    },
+    "mdw-monitor": {
+      "agent_id": "ILMS2OPXFK",
+      "agent_name": "mdw-monitor",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/ILMS2OPXFK/7QYC6JIU82"
+    },
+    "mdw-qa": {
+      "agent_id": "DKZRPN3HE6",
+      "agent_name": "mdw-qa",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/DKZRPN3HE6/S4VNRALUWP"
+    },
+    "mdw-refinery": {
+      "agent_id": "PKK6G6VRCI",
+      "agent_name": "mdw-refinery",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/PKK6G6VRCI/ZFOI4RVB4V"
+    },
+    "mdw-reliability": {
+      "agent_id": "YM2186QPEJ",
+      "agent_name": "mdw-reliability",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/YM2186QPEJ/WGG2ZFZ7WY"
+    },
+    "mdw-streaming-engineer": {
+      "agent_id": "O4BOMOKJ3B",
+      "agent_name": "mdw-streaming-engineer",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/O4BOMOKJ3B/MDZPSGWGSV"
+    },
+    "mdw-worker": {
+      "agent_id": "G5VAONTK5N",
+      "agent_name": "mdw-worker",
+      "alias_arn": "arn:aws:bedrock:us-east-1:717728193460:agent-alias/G5VAONTK5N/1IN4QUOZUH"
+    }
+  }
+}

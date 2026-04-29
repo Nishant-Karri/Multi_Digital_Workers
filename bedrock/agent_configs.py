@@ -14,7 +14,7 @@ def load_instruction(agent_id: str) -> str:
 
 
 # Model used for all agents — Claude Sonnet 4.5 on Bedrock cross-region inference
-FOUNDATION_MODEL = "us.anthropic.claude-sonnet-4-5-20251001-v1:0"
+FOUNDATION_MODEL = "anthropic.claude-sonnet-4-5-20250929-v1:0"
 
 # Mayor is the supervisor; all others are sub-agents it orchestrates
 AGENTS = [
