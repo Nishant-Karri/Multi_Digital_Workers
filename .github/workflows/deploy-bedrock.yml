@@ -1,0 +1,66 @@
+name: Deploy to AWS Bedrock Agent Core
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: AWS region
+        required: true
+        default: us-east-1
+      dry_run:
+        description: Dry run (no resources created)
+        type: boolean
+        default: false
+      agent:
+        description: Redeploy single agent id (leave blank for all)
+        required: false
+
+  push:
+    branches: [main]
+    paths:
+      - 'agents/*/CLAUDE.md'
+      - 'bedrock/**'
+      - 'config/agents.json'
+
+permissions:
+  id-token: write   # OIDC
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy MDW Agents → Bedrock
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ inputs.region || 'us-east-1' }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install boto3
+
+      - name: Deploy agents
+        run: |
+          ARGS="--region ${{ inputs.region || 'us-east-1' }}"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ -n "${{ inputs.agent }}" ]; then ARGS="$ARGS --agent ${{ inputs.agent }}"; fi
+          python bedrock/deploy.py $ARGS
+
+      - name: Upload manifest as artifact
+        if: ${{ inputs.dry_run != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: bedrock-manifest
+          path: bedrock/deployed_agents.json
+          retention-days: 90
